@@ -1,0 +1,1 @@
+SFML 2.0 along with some version of g++ that supports gnu++0x are required to compile this.  It is recommended to use at least g++ version 4.7 to compile this project.  I have not tried to compile this project with any other compilers, but it might be possible.
