@@ -25,7 +25,7 @@ namespace ioreg
 // until I implement non-DMG stuff
 enum gbtype { dmg, sgb, cgb, agb };
 
-// Oh look, a use for multiple inheritance
+// Oh look, ANOTHER use for multiple inheritance
 struct gbemu : public cpu, public mmu, public gpu
 {
 public:  // variables

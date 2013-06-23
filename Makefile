@@ -1,6 +1,6 @@
 # I am new to creating makefiles.
 
-CC=g++-4.7
+CC=g++
 CFLAGS=-masm=intel -std=gnu++0x -Wall -O3 -lsfml-graphics -lsfml-window  -lsfml-audio -lsfml-network -lsfml-system
 
 all: fl4shk_gbemu

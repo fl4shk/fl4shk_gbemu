@@ -34,7 +34,7 @@ void println () { cout << endl; }
 
 #include <SFML/Graphics.hpp>
 
-// Oh look, ANOTHER use for multiple inheritance!
+// Oh look, a use for multiple inheritance!
 class rt_input : public sf::Keyboard, public sf::Joystick, public sf::Mouse {};
 
 #include "gbemu_cls.hpp"
