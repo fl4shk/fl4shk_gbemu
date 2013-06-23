@@ -1,0 +1,17 @@
+GB CPU Clock Freq:  4194304 Hz
+Div Increment Freq:  16384 Hz
+Timer Increment Freq 00:  4096 Hz
+Timer Increment Freq 01:  262144 Hz
+Timer Increment Freq 10:  65536 Hz
+Timer Increment Freq 11:  16384 Hz
+
+Div Clock Stuff:  Increment every 256 clock cycles
+Timer Clock Stuff 00:  Increment every 1024 clock cycles
+Timer Clock Stuff 01:  Increment every 16 clock cycles
+Timer Clock Stuff 10:  Increment every 64 clock cycles
+Timer Clock Stuff 11:  Increment every 256 clock cycles
+LCD Stat Mode 2 (Reading OAM):  77-83 clocks
+LCD Stat Mode 3 ("Normal" Mode):  169-175 clocks
+LCD Stat Mode 0 (H-Blank):  201-207 clocks
+LCD Stat Mode 2,3,0 (Total):  456 clocks
+LCD Stat Mode 1 (V-Blank/Display Disabled):  4560 clocks
