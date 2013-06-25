@@ -1,5 +1,4 @@
-#ifndef gpu_funcs_hpp
-#define gpu_funcs_hpp
+#include "gpu.hpp"
 
 void gpu::reset ()
 {
@@ -55,6 +54,8 @@ void gpu::update_gfx ( int cycles )
 			
 			if ( lcdcy<144 )	// If we are not in VBlank Period
 			{
+				draw_scanline ();
+				
 				++lcdcy; op_free_write ( ioreg::lcdcy, lcdcy );
 				
 				if ( lcdcy==144 )		// If we have just made it to VBlank Period
@@ -161,5 +162,3 @@ void gpu::draw_scanline ()
 {
 	
 }
-
-#endif // gpu_funcs_hpp

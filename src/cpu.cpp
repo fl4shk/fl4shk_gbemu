@@ -1,5 +1,4 @@
-#ifndef cpu_funcs_hpp
-#define cpu_funcs_hpp
+#include "cpu.hpp"
 
 void cpu::set_zflag () { set_bit ( af.lo, zflag_slot ); }
 void cpu::clear_zflag () { clear_bit ( af.lo, zflag_slot ); }
@@ -1167,4 +1166,5 @@ void cpu::op_rst ( u8 nn )
 	pc = (u16)nn;
 }
 
-#endif // cpu_funcs_hpp
+// this is in a separate file to make stuff more readable... or something
+#include "cpu_jumptable.hpp"

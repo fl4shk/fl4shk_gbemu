@@ -1,12 +1,7 @@
-#ifndef cpu_cls_hpp
-#define cpu_cls_hpp
+#ifndef cpu_hpp
+#define cpu_hpp
 
-// Union for general-purpose registers (cpugpr looks strange to me, so I went with cpureg)
-// The idea here is to reduce the amount of bitwise stuff at the C++ level.
-// As a bonus, it also makes the code more readable. (I think...)
-union cpureg { u16 w; struct { u8 lo, hi; }; };
-
-enum jump_cndtn { z, nz, c, nc };	// jump condition
+#include "include.hpp"
 
 struct cpu		// Gameboy CPU Core
 {
@@ -44,7 +39,7 @@ public:  // functions
 	
 	// I don't think these two functions need to be virtual, but meh
 	virtual int exec ();
-	virtual no_fcall int exec_cb ();
+	virtual int exec_cb ();
 	
 	// the no_fcall thing is a #define that makes functions always_inline (gcc/g++ only AFAIK)
 	no_fcall void set_zflag (); no_fcall void clear_zflag (); 
@@ -89,12 +84,12 @@ public:  // functions
 	no_fcall void op_load_mem_imm_sp ();
 	
 	// stack commands
-	no_fcall void op_push_rr ( cpureg rr ); 
-	no_fcall void op_pop_rr ( cpureg &rr );
-	no_fcall void op_push_word ( cpureg rr ); 
-	no_fcall void op_push_word ( u16 rr );
-	no_fcall void op_pop_word ( cpureg &rr ); 
-	no_fcall void op_pop_word ( u16 &rr );
+	void op_push_rr ( cpureg rr ); 
+	void op_pop_rr ( cpureg &rr );
+	void op_push_word ( cpureg rr ); 
+	void op_push_word ( u16 rr );
+	void op_pop_word ( cpureg &rr ); 
+	void op_pop_word ( u16 &rr );
 	
 	
 	// math/logic commands
@@ -195,7 +190,7 @@ public:  // functions
 };
 
 
-#include "cpu_funcs.hpp"
-#include "cpu_jumptable.hpp"
+//#include "cpu_funcs.hpp"
+//#include "cpu_jumptable.hpp"
 
-#endif // cpu_cls_hpp
+#endif // cpu_hpp

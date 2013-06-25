@@ -1,12 +1,16 @@
-# I am new to creating makefiles.
+# [Insert witty comment here]
 
 cc=g++
-flags=-masm=intel -std=gnu++0x -Wall -O3 -lsfml-graphics -lsfml-window  -lsfml-audio -lsfml-network -lsfml-system
+cflags=-masm=intel -std=gnu++0x -Wall -O3 -c
+lflags=-masm=intel -std=gnu++0x -Wall -O3 -lsfml-graphics -lsfml-window  -lsfml-audio -lsfml-network -lsfml-system
+compile=$(cc) $(cflags)
+build=$(cc) $(lflags)
 
-all: fl4shk_gbemu
-
-fl4shk_gbemu: src/fl4shk_gbemu.cpp
-		$(cc) $(flags) src/fl4shk_gbemu.cpp -o fl4shk_gbemu
+all: 
+		make -C src/
 
 clean:  
-		rm -rf fl4shk_gbemu
+		make clean -C src/
+
+objclean:
+		make objclean -C src/

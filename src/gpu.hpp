@@ -1,5 +1,7 @@
-#ifndef gpu_cls_hpp
-#define gpu_cls_hpp
+#ifndef gpu_hpp
+#define gpu_hpp
+
+#include "include.hpp"
 
 struct gpu
 {
@@ -22,7 +24,7 @@ public:  // functions
 	virtual void op_free_write ( u16 addr, u8 data ) = 0;
 	virtual void request_int ( int which_int ) = 0;
 	
-	virtual no_fcall void reset ();
+	virtual void reset ();
 	
 	void update_gfx ( int cycles );
 	virtual u8 get_lcd_mode (); 
@@ -31,6 +33,4 @@ public:  // functions
 	
 };
 
-#include "gpu_funcs.hpp"
-
-#endif // gpu_cls_hpp
+#endif // gpu_hpp

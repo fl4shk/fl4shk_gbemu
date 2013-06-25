@@ -1,5 +1,4 @@
-#ifndef gbemu_funcs_hpp
-#define gbemu_funcs_hpp
+#include "gbemu.hpp"
 
 void gbemu::update ()
 {
@@ -63,5 +62,3 @@ void gbemu::request_int ( int which_int )
 	set_bit ( req, which_int );
 	op_write ( ioreg::intreq, req );
 }
-
-#endif // gbemu_funcs_hpp

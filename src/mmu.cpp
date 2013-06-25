@@ -1,5 +1,4 @@
-#ifndef mmu_funcs_hpp
-#define mmu_funcs_hpp
+#include "mmu.hpp"
 
 u8 mmu::op_read ( u16 addr )
 {
@@ -103,5 +102,3 @@ void mmu::reset ()
    gbram [0xFF4B] = 0x00;	// WX
    gbram [0xFFFF] = 0x00;	// IE
 }
-
-#endif // mmu_funcs_hpp
