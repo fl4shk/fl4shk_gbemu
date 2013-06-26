@@ -11,3 +11,6 @@
 *.lai
 *.la
 *.a
+
+# ROMs I don't want to distribute
+*.gb

@@ -6,9 +6,9 @@
 struct gpu
 {
 public:  // variables
-	static const int scanlclks = 456;  //, mode1clks = 4560;
+	static const int scanlclks = 456;
 	
-	int scanlcounter;  //, m1clksleft;
+	int scanlcounter;
 	
 	//The following are typical when the display is enabled:
 	//Mode 2  2_____2_____2_____2_____2_____2___________________2____

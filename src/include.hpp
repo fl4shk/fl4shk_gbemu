@@ -2,14 +2,35 @@
 #define include_hpp
 
 #include <iostream>
-#include <string>
-#include <fstream>
+#include <string>		// I don't know why this is here
+#include <fstream>		// "                           "
+#include <string.h>		// This is only needed for mmu::load_game ()
 using namespace std;
 
 #include <SFML/Graphics.hpp>
 
-// Oh look, a use for multiple inheritance!
-class rt_input : public sf::Keyboard, public sf::Joystick, public sf::Mouse {};
+typedef unsigned char u8; typedef signed char s8;
+typedef unsigned short u16; typedef signed short s16;
+typedef unsigned long u32; typedef signed long s32;
+typedef unsigned int uint;
+
+// This is a thing to enable always_inline with less typing (at least for GCC and its variants)
+#ifdef __GNUC__
+	#define no_fcall inline __attribute__((always_inline))
+#else
+	#define no_fcall inline
+#endif
+
+typedef sf::Keyboard kinput; typedef sf::Keyboard::Key kb;
+
+class color : public sf::Color
+{
+public:  // functions
+	color () { r = 0; g = 0; b = 0; a = 0; }
+	color ( u8 i_r, u8 i_g, u8 i_b, u8 i_a = 255 ) : sf::Color ( i_r, i_g, i_b, i_a ) {}
+	void operator = ( const sf::Color tocopy ) 
+		{ r = tocopy.r; g = tocopy.g; b = tocopy.b; a = tocopy.a; }
+};
 
 template < typename t > void print ( t val ) { cout << val; }
 template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
@@ -26,19 +47,6 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 //#define cgb_mmu_debug		// gbc-specific mmu debuging
 //#define cgb_gfx_debug		// gbc-specific gfx debugging
 //#define cgb_ir_debug		// gbc infrared communication debugging
-
-
-typedef unsigned char u8; typedef signed char s8;
-typedef unsigned short u16; typedef signed short s16;
-typedef unsigned long u32; typedef signed long s32;
-typedef unsigned int uint;
-
-// This is a thing to enable always_inline with less typing (at least for GCC and its variants)
-#ifdef __GNUC__
-	#define no_fcall inline __attribute__((always_inline))
-#else
-	#define no_fcall inline
-#endif
 
 namespace ioreg
 {

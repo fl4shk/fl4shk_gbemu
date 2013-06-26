@@ -19,7 +19,9 @@ public:  // functions
 	
 	virtual void reset ();
 	
+	void handle_banking ();
 	
+	void load_game ( const char *filename );
 };
 
 //#include "mmu_funcs.hpp"

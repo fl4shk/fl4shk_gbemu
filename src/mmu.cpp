@@ -20,27 +20,35 @@ void mmu::op_write ( u16 addr, u8 data )
 		//handle_banking ();
 	}
 	
-	// TO DO:  implement test to see if cartridge RAM is enabled
+	// TO DO:  implement tests to see if cartridge RAM is enabled
 	
+	// until I implement external memory handling, this area is restricted
 	else if ( addr<0xa000 )
 	{
-		// until I implement external memory handling, this area is restricted
+		
 	}
 	
-	else if ( addr<0xc000 )
+	else if ( addr<0xc000 )		// if we are doing stuff to VRAM
 	{
 		u8 lcdmode = get_lcd_mode ();
 		if ( lcdmode==0 || lcdmode==1 || lcdmode==2 )
 			gbram [addr] = data;
+		
+		// if the LCD is disabled
+		else if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
+			gbram [addr] = data;
 	}
 	
-	else if ( addr>=0xfe00 && addr<0xfea0 )
+	else if ( addr>=0xfe00 && addr<0xfea0 )		// if we are doing stuff to OAM
 	{
 		u8 lcdmode = get_lcd_mode ();
 		if ( lcdmode==0 || lcdmode==1 )
 			gbram [addr] = data;
+		
+		// if the LCD is disabled
+		else if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
+			gbram [addr] = data;
 	}
-	
 	
 	else if ( addr>=0xe000 && addr<0xfe00 )
 	{
@@ -55,6 +63,17 @@ void mmu::op_write ( u16 addr, u8 data )
 	
 	else if ( addr==ioreg::lcdcy )
 		gbram [ioreg::lcdcy] = 0x00;
+	
+	else if ( addr==0x0000 ) {}
+	
+	else if ( addr==ioreg::oamdma )
+	{
+		u16 dma_addr = data<<8;  // source addres is data*100
+		for ( int i=0; i<0xa0; ++i )
+		{
+			op_write ( 0xfe00+i, op_read (dma_addr+i) );
+		}
+	}
 	
 	// We don't need control over this area, so we write directly
 	else
@@ -101,4 +120,14 @@ void mmu::reset ()
    gbram [0xFF4A] = 0x00;	// WY
    gbram [0xFF4B] = 0x00;	// WX
    gbram [0xFFFF] = 0x00;	// IE
+}
+
+void mmu::load_game ( const char *filename )
+{
+	memset ( gbram, 0, gbram_size );
+	
+	FILE *in;
+	in = fopen ( filename, "rb" );	// This only works for 32 KB ROMs such as Tetris
+	fread ( gbram, 1, gbram_size, in );
+	fclose (in);
 }

@@ -2,7 +2,6 @@
 
 void gpu::reset ()
 {
-	//m1clksleft = mode1clks;
 	scanlcounter = scanlclks;
 }
 

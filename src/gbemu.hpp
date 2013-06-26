@@ -23,9 +23,40 @@ public:  // variables
 	gbtype emumode;
 	
 public:  // functions
+	gbemu ( const char *filename )
+	{
+		load_game (filename);
+		loop ();
+	}
+	
+	void loop ()
+	{
+		sf::RenderWindow app ( sf::VideoMode ( 160, 144 ), "FL4SHK GBemu" );
+		app.setFramerateLimit (60); app.clear ( color::White );
+		
+		while ( app.isOpen () )
+		{
+			sf::Event event;
+			
+			while ( app.pollEvent (event) )
+			{
+				if ( event.type == sf::Event::Closed )
+					app.close ();
+			}
+			
+			if ( kinput::isKeyPressed (kb::Escape ) )
+				app.close ();
+			
+			update ();
+			
+			app.display ();
+		}
+	}
+	
 	u8 op_read ( u16 addr ) { return mmu::op_read (addr); }
 	u16 op_read_word ( u16 addr ) { return mmu::op_read_word (addr); }
 	void op_write ( u16 addr, u8 data ) { mmu::op_write ( addr, data ); }
+	void op_free_write ( u16 addr, u8 data ) { mmu::op_free_write ( addr, data ); }
 	
 	// The cpu::reset and mmu::reset functions are DMG-based,
 	// so we need to do some extra stuff in the gbemu::reset function.
@@ -53,6 +84,8 @@ public:  // functions
 	void do_interrupts ();
 	void service_int ( int which_int );
 	void request_int ( int which_int );
+	
+	
 	
 };
 

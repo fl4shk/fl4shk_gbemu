@@ -6,7 +6,20 @@ void gbemu::update ()
 	
 	while ( cycles_this_update<max_cycles )
 	{
-		int cycles = exec ();
+		int cycles;
+		
+		if (!halted) cycles = exec ();
+		else cycles = 4;
+		
+		if ( pending_clear_ime && op_read (pc-1) != 0xF3)
+		{
+			pending_clear_ime = false; ime = false;
+		}
+		if ( pending_set_ime && op_read (pc-1) != 0xFB )
+		{
+			pending_set_ime = false; ime = true;
+		}
+		
 		cycles_this_update += cycles;
 		update_timers (cycles);
 		update_gfx (cycles);
