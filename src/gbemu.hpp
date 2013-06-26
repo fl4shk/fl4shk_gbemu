@@ -25,14 +25,22 @@ public:  // variables
 public:  // functions
 	gbemu ( const char *filename )
 	{
+		reset ();
 		load_game (filename);
-		loop ();
+		run_game ();
 	}
 	
-	void loop ()
+	void run_game ()
 	{
 		sf::RenderWindow app ( sf::VideoMode ( 160, 144 ), "FL4SHK GBemu" );
 		app.setFramerateLimit (60); app.clear ( color::White );
+		
+		sf::Texture txtr; sf::Sprite spr;
+		txtr.create ( 160, 144 ); txtr.setSmooth (false); 
+		txtr.update ((u8 *)screen); spr.setTexture (txtr);
+		
+		for ( int i=0; i<num_pixels; ++i )
+			screen [i] = color ( 255, 120, 0 );
 		
 		while ( app.isOpen () )
 		{
@@ -48,6 +56,9 @@ public:  // functions
 				app.close ();
 			
 			update ();
+			
+			txtr.update ((u8 *)screen);
+			app.draw (spr);
 			
 			app.display ();
 		}

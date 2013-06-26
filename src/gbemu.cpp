@@ -24,6 +24,11 @@ void gbemu::update ()
 		update_timers (cycles);
 		update_gfx (cycles);
 		do_interrupts ();
+		
+		#ifdef update_debug
+		cout << "cycles_this_update:  " << cycles_this_update << "\n";
+		#endif // update_debug
+		
 	}
 	render_screen ();
 }
@@ -40,6 +45,13 @@ void gbemu::do_divreg ( int cycles )
 
 void gbemu::do_interrupts ()
 {
+	#ifdef int_debug
+	cout << "We are in the do_interrupts () function.\n";
+	cout << "Interrupt Master Enable:  " << ime << ".\n";
+	cout << "gbram [ioreg::intreq]:  " 
+		<< hex << (int)gbram [ioreg::intreq] << dec << ".\n";
+	#endif //int_debug
+	
 	if ( ime==true && gbram [ioreg::intreq]>0 )
 	{
 		for ( int i=0; i<5; ++i )
@@ -53,6 +65,11 @@ void gbemu::do_interrupts ()
 
 void gbemu::service_int ( int which_int )
 {
+	#ifdef int_debug
+	cout << "We are servicing interrupt " << which_int << ".\n";
+	#endif //int_debug
+	
+	
 	ime = false;
 	
 	clear_bit ( gbram [ioreg::intreq], which_int );

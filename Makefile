@@ -8,3 +8,6 @@ clean:
 
 objclean:
 		make objclean -C src/
+
+rebuild:
+		make clean && make

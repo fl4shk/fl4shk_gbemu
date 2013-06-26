@@ -35,7 +35,7 @@ void mmu::op_write ( u16 addr, u8 data )
 			gbram [addr] = data;
 		
 		// if the LCD is disabled
-		else if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
+		if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
 			gbram [addr] = data;
 	}
 	
@@ -46,7 +46,7 @@ void mmu::op_write ( u16 addr, u8 data )
 			gbram [addr] = data;
 		
 		// if the LCD is disabled
-		else if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
+		if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
 			gbram [addr] = data;
 	}
 	

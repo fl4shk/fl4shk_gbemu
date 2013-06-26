@@ -36,9 +36,8 @@ template < typename t > void print ( t val ) { cout << val; }
 template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 //void println () { cout << endl; }
 
-// (To be implemented)
 // Uncomment these to compile debugging stuff into the emulator
-#define cpu_debug
+//#define cpu_debug
 //#define mmu_debug
 //#define gfx_debug
 //#define apu_debug
@@ -47,6 +46,7 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 //#define cgb_mmu_debug		// gbc-specific mmu debuging
 //#define cgb_gfx_debug		// gbc-specific gfx debugging
 //#define cgb_ir_debug		// gbc infrared communication debugging
+//#define update_debug
 
 namespace ioreg
 {

@@ -35,7 +35,7 @@ public:  // functions
 	// TO DO:  Implement the differences between the different GB types
 	virtual void reset () 
 		{ af.w = 0x0013; bc.w = 0x00d8; de.w = 0x014d; 
-		hl.w = 0x014d; sp = 0xFFFE; pc = 0x100; }
+		hl.w = 0x014d; sp = 0xFFFE; pc = 0x100; ime = true; }
 	
 	// I don't think these two functions need to be virtual, but meh
 	virtual int exec ();

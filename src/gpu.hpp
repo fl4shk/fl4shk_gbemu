@@ -10,12 +10,7 @@ public:  // variables
 	
 	int scanlcounter;
 	
-	//The following are typical when the display is enabled:
-	//Mode 2  2_____2_____2_____2_____2_____2___________________2____
-	//Mode 3  _33____33____33____33____33____33__________________3___
-	//Mode 0  ___000___000___000___000___000___000________________000
-	//Mode 1  ____________________________________11111111111111_____
-	
+	static const int num_pixels = 160*144; color screen [num_pixels];
 	
 public:  // functions
 	virtual u8 op_read ( u16 addr ) = 0;

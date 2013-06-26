@@ -259,13 +259,20 @@ void cpu::op_add_hl_mem ()
 
 void cpu::op_add_hl_rr ( u16 rr )
 {
+	pc++;
+	
 	clear_nflag ();
 	
 	static uint temp_hl_val = (uint)hl.w, val_to_add = (uint)rr;
 	
-	if ( ( temp_hl_val&0xfff )+( val_to_add&0xfff )>4095 ) set_hflag ();
-	else clear_hflag ();
-	if ( ( temp_hl_val+val_to_add ) > 65535 ) set_cflag (); else clear_cflag ();
+	if ( ( temp_hl_val&0xfff )+( val_to_add&0xfff )>4095 ) 
+		set_hflag ();
+	else 
+		clear_hflag ();
+	if ( ( temp_hl_val+val_to_add ) > 65535 ) 
+		set_cflag (); 
+	else 
+		clear_cflag ();
 	temp_hl_val = ( ( temp_hl_val+val_to_add )&0xffff );
 	hl.w = (u16)temp_hl_val;
 }

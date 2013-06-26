@@ -6,7 +6,17 @@ int cpu::exec ()
 	u8 opcode = op_read (pc);
 	
 	#ifdef cpu_debug
-	cout << "Executing opcode 0x" << hex << (int)opcode << dec << ".\n";
+	cout << "Executing opcode 0x" << hex;
+	if ( opcode<0x10 ) 
+		cout << "0";
+	cout << (int)opcode << " at PC address 0x"; 
+	if ( pc<0x10 ) 
+		cout << "000"; 
+	else if ( pc<0x100 ) 
+		cout << "00";
+	else if ( pc<0x1000 ) 
+		cout << "0";
+	cout << pc << dec << ".\n";
 	#endif
 	
 	// the return value is the number of cycles
