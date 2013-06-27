@@ -1135,24 +1135,20 @@ void cpu::op_ret ()
 
 void cpu::op_ret_f ( jump_cndtn f )
 {
-	// We don't need the pc++ here
+	pc++;
 	switch (f)
 	{
 		case z:  
-			if ( get_zflag () )
-				op_pop_word (pc);
+			if ( get_zflag () ) op_pop_word (pc);
 			break;
 		case nz:  
-			if ( !get_zflag () )
-				op_pop_word (pc);
+			if ( !get_zflag () ) op_pop_word (pc);
 			break;
 		case c:  
-			if ( get_cflag () )
-				op_pop_word (pc);
+			if ( get_cflag () ) op_pop_word (pc);
 			break;
 		case nc:  
-			if ( !get_cflag () )
-				op_pop_word (pc);
+			if ( !get_cflag () ) op_pop_word (pc);
 			break;
 		default:  
 			break;

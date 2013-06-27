@@ -55,6 +55,18 @@ public:  // functions
 			if ( kinput::isKeyPressed (kb::Escape ) )
 				app.close ();
 			
+			if ( kinput::isKeyPressed (kb::A) && false )
+			{
+				for ( u16 i=0x8000; i<0x8100; ++i )
+				{
+					cout << hex << "0x" << (int)op_read (i) << " ";
+					//cout << hex << "0x" << (int)op_read (0x8010) << endl;
+				}
+				
+				sf::Clock tempclk;
+				while ( tempclk.getElapsedTime ().asSeconds ()<2.0f ) {}
+			}
+			
 			update ();
 			
 			txtr.update ((u8 *)screen);
@@ -68,6 +80,8 @@ public:  // functions
 	u16 op_read_word ( u16 addr ) { return mmu::op_read_word (addr); }
 	void op_write ( u16 addr, u8 data ) { mmu::op_write ( addr, data ); }
 	void op_free_write ( u16 addr, u8 data ) { mmu::op_free_write ( addr, data ); }
+	
+	u16 get_pc () { return pc; }
 	
 	// The cpu::reset and mmu::reset functions are DMG-based,
 	// so we need to do some extra stuff in the gbemu::reset function.

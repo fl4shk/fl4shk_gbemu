@@ -3,6 +3,7 @@
 
 #include "include.hpp"
 
+enum col_slot { white, gray1, gray2, black };
 struct gpu
 {
 public:  // variables
@@ -10,7 +11,9 @@ public:  // variables
 	
 	int scanlcounter;
 	
-	static const int num_pixels = 160*144; color screen [num_pixels];
+	static const int hres = 160, vres = 144;
+	static const int num_pixels = hres*vres; color screen [num_pixels];
+	static const int tiles_per_line = 20;
 	
 public:  // functions
 	virtual u8 op_read ( u16 addr ) = 0;

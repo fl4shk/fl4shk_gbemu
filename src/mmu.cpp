@@ -14,29 +14,57 @@ u16 mmu::op_read_word ( u16 addr )
 
 void mmu::op_write ( u16 addr, u8 data )
 {
+	//if ( addr==ioreg::lcdctrl )
+	//{
+		//cout << hex << (int)data << "  PC:  " << get_pc () << dec << "\n";
+	//}
+	
 	// Not going to be handling banking just yet
 	if ( addr<0x8000 )
 	{
 		//handle_banking ();
 	}
 	
-	// TO DO:  implement tests to see if cartridge RAM is enabled
+	// TO --NOT-- DO Again:  Confuse addr<0xa000 with working with external RAM 
+	// (AWFUL bug!)
 	
-	// until I implement external memory handling, this area is restricted
-	else if ( addr<0xa000 )
-	{
-		
-	}
-	
-	else if ( addr<0xc000 )		// if we are doing stuff to VRAM
+	else if ( addr<0xa000 )		// if we are doing stuff to VRAM
 	{
 		u8 lcdmode = get_lcd_mode ();
 		if ( lcdmode==0 || lcdmode==1 || lcdmode==2 )
+		{
 			gbram [addr] = data;
+			
+			#ifdef gpu_debug
+		
+			cout << "Writing 0x" << hex << (int)data << " at address 0x"
+				<< addr << dec << ".\n";
+			
+			#endif // gpu_debug
+		}
 		
 		// if the LCD is disabled
 		if ( !test_bit ( op_read (ioreg::lcdctrl), 7 ) )
+		{
 			gbram [addr] = data;
+			
+			#ifdef gpu_debug
+		
+			cout << "Writing 0x" << hex << (int)data << " at address 0x"
+				<< addr << dec << ".\n";
+			
+			#endif // gpu_debug
+			
+		}
+		
+	}
+	
+	
+	// TO DO:  implement tests to see if cartridge RAM is enabled
+	// until I implement external memory handling, this area is restricted
+	else if ( addr<0xc000 )
+	{
+		
 	}
 	
 	else if ( addr>=0xfe00 && addr<0xfea0 )		// if we are doing stuff to OAM

@@ -16,6 +16,7 @@ public:  // functions
 	virtual void op_free_write ( u16 addr, u8 data );
 	
 	virtual u8 get_lcd_mode () = 0;
+	virtual u16 get_pc () = 0;
 	
 	virtual void reset ();
 	

@@ -12,5 +12,5 @@
 *.la
 *.a
 
-# ROMs I don't want to distribute
+# Homebrew ROMs I don't want to upload due to their size/my upload speed
 *.gb

@@ -31,6 +31,8 @@ public:  // functions
 	virtual void op_write ( u16 addr, u8 data ) {};
 	virtual bool stop () { return true; };
 	
+	virtual u16 get_pc () { return pc; }
+	
 	// This function is declared virtual because of the multiple inheritance
 	// TO DO:  Implement the differences between the different GB types
 	virtual void reset () 

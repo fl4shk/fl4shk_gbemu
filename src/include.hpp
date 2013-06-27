@@ -30,6 +30,10 @@ public:  // functions
 	color ( u8 i_r, u8 i_g, u8 i_b, u8 i_a = 255 ) : sf::Color ( i_r, i_g, i_b, i_a ) {}
 	void operator = ( const sf::Color tocopy ) 
 		{ r = tocopy.r; g = tocopy.g; b = tocopy.b; a = tocopy.a; }
+	void set_white () { operator = ( color ( 255, 255, 255 ) ); }
+	void set_gray1 () { operator = ( color ( 170, 170, 170 ) ); }
+	void set_gray2 () { operator = ( color ( 85, 85, 85 ) ); }
+	void set_black () { operator = ( color ( 0, 0, 0 ) ); }
 };
 
 template < typename t > void print ( t val ) { cout << val; }
@@ -39,7 +43,7 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 // Uncomment these to compile debugging stuff into the emulator
 //#define cpu_debug
 //#define mmu_debug
-//#define gfx_debug
+#define gpu_debug
 //#define apu_debug
 //#define timer_debug
 //#define int_debug			// interrupt debugging
