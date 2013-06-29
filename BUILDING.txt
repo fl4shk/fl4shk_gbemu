@@ -1,4 +1,9 @@
-SFML 2.0 along with some version of g++ that supports gnu++0x are required to 
-compile this.  It is recommended to use at least g++ version 4.7 to compile this 
-project.  I have not tried to compile this project with any other compilers, but it 
-might be possible.
+Some version of g++ that supports gnu++0x is recommended to compile this.  I have 
+not tried to compile this project with any other compilers, but it might be possible.
+
+SFML 2.0 is a dependency (along with whatever its dependencies are).  Linux Mint 15 
+and Ubuntu 13.04 do not ship with SFML 2.0 in their repositories.  If you are using 
+either of those distros, you will probably have to compile it yourself.
+
+The following guide is easy to use for compiling SFML 2.0 on recent Linux distros.  I have only done this on Linux Mint 13 and Linux Mint 15, but doing this on other distros should be easy.
+https://sfmlcoder.wordpress.com/2011/08/16/building-sfml-2-0-with-make-for-gcc/
