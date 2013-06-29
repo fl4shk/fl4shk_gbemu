@@ -13,7 +13,8 @@ public:  // variables
 	
 	static const int hres = 160, vres = 144;
 	static const int num_pixels = hres*vres; color screen [num_pixels];
-	static const int tiles_per_line = 20;
+	static const int tiles_per_row = 20;
+	
 	
 public:  // functions
 	virtual u8 op_read ( u16 addr ) = 0;
@@ -26,9 +27,10 @@ public:  // functions
 	
 	void update_gfx ( int cycles );
 	virtual u8 get_lcd_mode (); 
-	void render_screen ();
-	void draw_scanline ();
+	no_fcall void draw_scanline ();
+	no_fcall void render_bg (); no_fcall void render_obj ();
 	
+	no_fcall col_slot get_color ( u8 color_num, u16 addr );
 };
 
 #endif // gpu_hpp

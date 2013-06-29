@@ -11,12 +11,19 @@ void gbemu::update ()
 		if (!halted) cycles = exec ();
 		else cycles = 4;
 		
-		if ( pending_clear_ime && op_read (pc-1) != 0xF3)
+		//cout << "pending_clear_ime:  " << pending_clear_ime 
+			//<< " pending_set_ime:  " << pending_set_ime << "\n";
+		
+		if ( pending_clear_ime /*&& op_read (pc-1) != 0xf3*/ )
 		{
+			//cout << "Clearing the IME.\n";
+			
 			pending_clear_ime = false; ime = false;
 		}
-		if ( pending_set_ime && op_read (pc-1) != 0xFB )
+		if ( pending_set_ime /*&& op_read (pc-1) != 0xfb*/ )
 		{
+			//cout << "Setting the IME.\n";
+			
 			pending_set_ime = false; ime = true;
 		}
 		
@@ -30,7 +37,62 @@ void gbemu::update ()
 		#endif // update_debug
 		
 	}
-	render_screen ();
+	//render_screen ();
+}
+
+void gbemu::run_game ()
+{
+	// We don't need app to exist outside of run_game ()
+	sf::RenderWindow app ( sf::VideoMode ( 160, 144 ), "FL4SHK GBemu" );
+	app.setFramerateLimit (60); app.clear ( color::White );
+	
+	sf::Texture txtr; sf::Sprite spr;
+	txtr.create ( hres, vres ); txtr.setSmooth (false); 
+	spr.setTexture (txtr);
+	
+	for ( int y=0; y<vres; ++y )
+	{
+		for ( int x=0; x<hres; ++x )
+			screen [y*hres+x] = color ( (u8)y*hres+x, 0, 0 );
+	}
+	
+	while ( app.isOpen () )
+	{
+		sf::Event event;
+		
+		while ( app.pollEvent (event) )
+		{
+			if ( event.type == sf::Event::Closed )
+				app.close ();
+			
+			else if ( event.type == sf::Event::KeyPressed )
+			{
+				if ( event.key.code == kb::A )
+				{
+					for ( u16 i=0x8000; i<0xa000; i+=2 )
+					{
+						cout << hex << "addr 0x" << i << ":  0x"
+							<< (int)op_read (i) << "  ";
+						cout << hex << "addr 0x" << i+1 << ":  0x"
+							<< (int)op_read (i+1) << endl;
+					}
+					
+					sf::Clock tempclk;
+					while ( tempclk.getElapsedTime ().asSeconds ()<1 ) {}
+				}
+				else if ( event.key.code == kb::Escape )
+					app.close ();
+			}
+		}
+		
+		update ();
+		
+		txtr.update ((u8 *)screen);
+		
+		app.draw (spr);
+		
+		app.display ();
+	}
 }
 
 void gbemu::update_timers ( int cycles )
@@ -45,7 +107,7 @@ void gbemu::do_divreg ( int cycles )
 
 void gbemu::do_interrupts ()
 {
-	#ifdef int_debug
+	#ifdef int_debug //disabling this
 	cout << "We are in the do_interrupts () function.\n";
 	cout << "Interrupt Master Enable:  " << ime << ".\n";
 	cout << "gbram [ioreg::intreq]:  " 
@@ -88,6 +150,8 @@ void gbemu::service_int ( int which_int )
 
 void gbemu::request_int ( int which_int )
 {
+	//cout << "Requesting interrupt " << which_int << endl;
+	
 	u8 req = op_read (ioreg::intreq);
 	set_bit ( req, which_int );
 	op_write ( ioreg::intreq, req );

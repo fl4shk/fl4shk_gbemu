@@ -43,7 +43,7 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 // Uncomment these to compile debugging stuff into the emulator
 //#define cpu_debug
 //#define mmu_debug
-#define gpu_debug
+//#define gpu_debug
 //#define apu_debug
 //#define timer_debug
 //#define int_debug			// interrupt debugging
@@ -63,7 +63,7 @@ namespace ioreg
 		nr52 = 0xff26, wavstart = 0xff30, wavend = 0xff3f, lcdctrl = 0xff40, 
 		lcdstat = 0xff41, scrolly = 0xff42, scrollx = 0xff43, lcdcy = 0xff44, 
 		lycomp = 0xff45, oamdma = 0xff46, dmgbgp = 0xff47, dmgobjp0 = 0xff48, 
-		dmgobjp1 = 0xff49, wnd_y = 0xff4a, wnd_x = 0xff4b, intenab = 0xffff;
+		dmgobjp1 = 0xff49, wndy = 0xff4a, wndx = 0xff4b, intenab = 0xffff;
 };
 
 // Union for general-purpose registers (cpugpr looks strange to me, so I went with cpureg)

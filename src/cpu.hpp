@@ -13,8 +13,6 @@ public:  // variables
 	
 	bool halted, stopped, ime, pending_set_ime, pending_clear_ime;
 	
-	
-	
 	// ram stuff for debugging the CPU core
 	//static const int ram_size = 0x10000;
 	//u8 ram [ram_size];

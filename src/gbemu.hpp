@@ -11,70 +11,26 @@
 // until I implement non-DMG stuff
 enum gbtype { dmg, sgb, cgb, agb };
 
-// Oh look, ANOTHER use for multiple inheritance
+// Oh look, a use for multiple inheritance
 struct gbemu : public cpu, public mmu, public gpu
 {
 public:  // variables
 	static const int divclks = 256, tmr00clks = 1024, tmr01clks = 16, tmr10clks = 64,
 		tmr11clks = 256;
 	
-	int divclksleft, tmrclksleft;
+	int divclksleft, tmrclksleft; //, clear_ime_clks, set_ime_clks
 	
 	gbtype emumode;
 	
 public:  // functions
 	gbemu ( const char *filename )
 	{
-		reset ();
 		load_game (filename);
+		reset ();
 		run_game ();
 	}
 	
-	void run_game ()
-	{
-		sf::RenderWindow app ( sf::VideoMode ( 160, 144 ), "FL4SHK GBemu" );
-		app.setFramerateLimit (60); app.clear ( color::White );
-		
-		sf::Texture txtr; sf::Sprite spr;
-		txtr.create ( 160, 144 ); txtr.setSmooth (false); 
-		txtr.update ((u8 *)screen); spr.setTexture (txtr);
-		
-		for ( int i=0; i<num_pixels; ++i )
-			screen [i] = color ( 255, 120, 0 );
-		
-		while ( app.isOpen () )
-		{
-			sf::Event event;
-			
-			while ( app.pollEvent (event) )
-			{
-				if ( event.type == sf::Event::Closed )
-					app.close ();
-			}
-			
-			if ( kinput::isKeyPressed (kb::Escape ) )
-				app.close ();
-			
-			if ( kinput::isKeyPressed (kb::A) && false )
-			{
-				for ( u16 i=0x8000; i<0x8100; ++i )
-				{
-					cout << hex << "0x" << (int)op_read (i) << " ";
-					//cout << hex << "0x" << (int)op_read (0x8010) << endl;
-				}
-				
-				sf::Clock tempclk;
-				while ( tempclk.getElapsedTime ().asSeconds ()<2.0f ) {}
-			}
-			
-			update ();
-			
-			txtr.update ((u8 *)screen);
-			app.draw (spr);
-			
-			app.display ();
-		}
-	}
+	void run_game ();
 	
 	u8 op_read ( u16 addr ) { return mmu::op_read (addr); }
 	u16 op_read_word ( u16 addr ) { return mmu::op_read_word (addr); }

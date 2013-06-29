@@ -94,6 +94,14 @@ void cpu::op_load_io_n_a ()
 
 void cpu::op_load_a_hli ()
 {
+	if ( pc==0xc0cd && false )
+	{
+		cout << hex << "Executing ldi a,(hl) at PC address 0xc0cd" << endl;
+		cout << "hl:  " << hl.w << "  (hl):  " << (int)op_read (hl.w) << dec
+			<< endl;
+		
+	}
+	
 	pc++; af.hi = op_read (hl.w); hl.w++;
 }
 
@@ -666,50 +674,80 @@ void cpu::op_rlca ()
 	
 	clear_zflag (); clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( af.hi, 7 ) ) set_cflag ();
-	else clear_cflag ();
+	static u8 temp;
+	temp = ( af.hi&0x80 );	// save old bit 7
+	af.hi <<= 1;
+	if ( temp==0 )
+	{
+		clear_cflag ();
+		af.hi &= 0xf7;		// restore old bit 7 into bit 0
+	}
+	else
+	{
+		set_cflag ();
+		af.hi |= 0x01;		// restore old bit 7 into bit 0
+	}
 	
-	af.hi = ( af.hi<<1 )+get_cflag ();
+	//if ( get_bit ( af.hi, 7 ) ) set_cflag ();
+	//else clear_cflag ();
+	//
+	//af.hi = ( af.hi<<1 )+get_cflag ();
 }
 
 void cpu::op_rla ()
 {
 	pc++;
 	
-	clear_zflag (); clear_nflag (); clear_hflag ();
+	clear_nflag (); clear_hflag ();
 	
-	bool ocf = get_cflag ();
+	static u8 temp;
+	temp = ( af.hi&0x80 );  // save old bit 7
+	af.hi <<= 1;	// shift left by 1
+	if ( get_cflag ()!=0 ) af.hi |= 0x01;	// rotate carry flag into bit 0
+	if ( temp==0 ) clear_cflag ();		// restore old bit 7 into carry flag
+	else set_cflag ();		// restore old bit 7 into carry flag
 	
-	if ( get_bit ( af.hi, 7 ) ) set_cflag ();
-	else clear_cflag ();
+	if ( af.hi==0 ) set_zflag ();
+	else clear_zflag ();
 	
-	af.hi = ( af.hi<<1 )+ocf;
 }
 
 void cpu::op_rrca ()
 {
 	pc++;
 	
+	static u8 temp;
+	temp = af.hi & 0x01;		// save old bit 7
+	af.hi >>= 1;		// shift right by 1
+	if ( temp==0 )		// if old bit 7 was 0
+	{
+		clear_cflag ();		// clear carry flag
+		af.hi &= 0x7f;		// restore old bit 7 into bit 0
+	}
+	else		// if old bit 7 was 1
+	{
+		set_cflag ();		// set carry flag
+		af.hi |= 0x80;		// restore old bit 7 into bit 0
+	}
+	
 	clear_zflag (); clear_nflag (); clear_hflag ();
-	
-	if ( get_bit ( af.hi, 0 ) ) set_cflag ();
-	else clear_cflag ();
-	
-	af.hi = ( af.hi>>1 ) + ( get_cflag ()<<7 );
 }
 
 void cpu::op_rra ()
 {
 	pc++;
 	
-	clear_zflag (); clear_nflag (); clear_hflag ();
+	clear_nflag (); clear_hflag ();
 	
-	bool ocf = get_cflag ();
+	static u8 temp;
+	temp = af.hi & 0x01;  // save old bit 0
+	af.hi >>= 1;		// shift right by 1
+	if ( get_cflag ()!=0 ) af.hi |= 0x80;	// rotate carry flag into bit 7
+	if ( temp==0 ) clear_cflag ();		// restore old bit 0 into cflag
+	else clear_cflag ();		// restore old bit 0 into cflag;
 	
-	if ( get_bit ( af.hi, 0 ) ) set_cflag ();
-	else clear_cflag ();
-	
-	af.hi = ( af.hi>>1 ) + ( ocf<<7 );	
+	if ( af.hi==0 ) set_zflag ();	// (required to pass Blargg's test #09)
+	else clear_zflag ();
 }
 
 void cpu::op_rlc_r ( u8 &r )
@@ -718,10 +756,14 @@ void cpu::op_rlc_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( r, 7 ) ) set_cflag ();
-	else clear_cflag ();
+	if ( ( r&0x80 )==0 ) clear_cflag ();		// save bit 7 into cflag
+	else set_cflag ();
 	
-	r = ( r<<1 ) + get_cflag ();
+	r <<= 1;
+	
+	// now restore old bit 7 (held in cflag) into bit 0
+	if ( get_cflag ()==0 ) r &= 0x7f;
+	else r |= 0x01;
 	
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
@@ -741,15 +783,19 @@ void cpu::op_rl_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	bool ocf = get_cflag ();
+	static u8 temp;
+	temp = r&0x80;		// save old bit 7
+	r <<= 1;		// shift left by 1
+	if ( get_cflag ()!=0 ) r |= 0x01;		// rotate carry flag into bit 0
 	
-	if ( get_bit ( r, 7 ) ) set_cflag ();
-	else clear_cflag ();
+	// restore old bit 7 into carry flag
+	if ( temp==0 ) clear_cflag ();
+	else set_cflag ();
 	
-	r = ( r<<1 ) + ocf;
-	
+	// set or reset the zflag (this is required to pass Blargg's test #09)
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
+	
 }
 
 void cpu::op_rl_hl_mem ()
@@ -767,10 +813,15 @@ void cpu::op_rrc_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( r, 0 ) ) set_cflag ();
-	else clear_cflag ();
+	// save bit 0 into flag c
+	if ( ( r&0x01 )==0 )	clear_cflag ();
+	else set_cflag ();
 	
-	r = ( r>>1 ) + ( get_cflag ()<<7 );
+	r >>= 1;
+	
+	// now restore old bit 0 (held in cflag) into bit 7
+	if ( get_cflag ()==0 ) r &= 0x7f;
+	else r |= 0x80;
 	
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
@@ -790,13 +841,15 @@ void cpu::op_rr_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	bool ocf = get_cflag ();
+	static u8 temp;
+	temp = r&0x01;		// save old bit 0
+	r >>= 1;	// shift right by 1;
+	if ( get_cflag ()!=0 ) r |= 0x80;		// rotate carry flag into bit 7
 	
-	if ( get_bit ( r, 0 ) ) set_cflag ();
-	else clear_cflag ();
+	if ( temp==0 ) clear_cflag ();
+	else set_cflag ();
 	
-	r = ( r>>1 ) + ( ocf<<7 );
-	
+	// required to pass Blargg's test #09
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
 }
@@ -815,11 +868,11 @@ void cpu::op_sla_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( r, 7 ) ) set_cflag ();
-	else clear_cflag ();
+	if ( ( r&0x80 )==0 ) clear_cflag ();
+	else set_cflag ();
 	
 	r <<= 1;
-	
+	r &= 0xff;	// don't know what this is for
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
 }
@@ -838,13 +891,12 @@ void cpu::op_sra_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( r, 0 ) ) set_cflag ();
-	else clear_cflag ();
+	if ( ( r&0x01 )==0 ) clear_cflag ();
+	else set_cflag ();
 	
 	r >>= 1;
-	
-	if ( get_bit ( r, 6 ) ) set_bit ( r, 7 );
-	else clear_bit ( r, 7 );
+	if ( ( r&0x80 )==0 ) r &= 0x7f;		// restore old bit 7 as it was
+	else r |= 0x80;
 	
 	if ( r==0 ) set_zflag ();
 	else clear_zflag ();
@@ -864,13 +916,15 @@ void cpu::op_srl_r ( u8 &r )
 	
 	clear_nflag (); clear_hflag ();
 	
-	if ( get_bit ( r, 0 ) ) set_cflag ();
-	else clear_cflag ();
+	// shift r right into carry (msb set to 0), and set some flags
+	if ( ( r&0x01 )==0 ) clear_cflag ();	// C contains old bit 0
+	else set_cflag ();
 	
-	r >>= 1;
-	
-	if ( r==0 ) set_zflag ();
+	r >>= 1;		// shift right by 1
+	r &= 0x7f;		// and make sure to reset msb
+	if ( r==0 ) set_zflag ();	// set or reset zflag
 	else clear_zflag ();
+	
 }
 
 void cpu::op_srl_hl_mem ()

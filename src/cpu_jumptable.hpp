@@ -829,7 +829,7 @@ int cpu::exec_cb ()
 	u8 opcode = op_read (pc);
 	
 	#ifdef cpu_debug
-	cout << "Executing CB-prefixed opcode 0x" << hex << opcode << dec << ".\n";
+	cout << "Executing CB-prefixed opcode 0x" << hex << (int)opcode << dec << ".\n";
 	#endif
 	
 	// TO DO:  put actual number of cycles for each return value

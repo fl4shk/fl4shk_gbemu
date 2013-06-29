@@ -14,10 +14,6 @@ u16 mmu::op_read_word ( u16 addr )
 
 void mmu::op_write ( u16 addr, u8 data )
 {
-	//if ( addr==ioreg::lcdctrl )
-	//{
-		//cout << hex << (int)data << "  PC:  " << get_pc () << dec << "\n";
-	//}
 	
 	// Not going to be handling banking just yet
 	if ( addr<0x8000 )
@@ -30,6 +26,14 @@ void mmu::op_write ( u16 addr, u8 data )
 	
 	else if ( addr<0xa000 )		// if we are doing stuff to VRAM
 	{
+		//cout << "Attempting to write to VRAM.... ";
+		
+		//if ( addr==0x9800 )
+		//{
+			//cout << "Writing 0x" << hex << (int)data << " from PC address 0x"
+				//<< get_pc () << endl << dec;
+		//}
+		
 		u8 lcdmode = get_lcd_mode ();
 		if ( lcdmode==0 || lcdmode==1 || lcdmode==2 )
 		{
