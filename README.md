@@ -15,5 +15,5 @@ game.gb in the directory where this thing is being launched causes a segmentatio
 fault.  
 
 There are currently CPU bugs that make it impossible to run most 32 KB ROMs.  
-However, I have included a test ROM that DOES work.  It is called testrom.  Rename it 
-to game.gb if you wish to run it.
+However, I have included a test ROM that DOES work.  It is called 
+changemetogame(dot)gb.  Rename it to game.gb if you wish to run it.
