@@ -1,5 +1,7 @@
 #include "gbemu.hpp"
 
+constexpr int gbemu::tmrclks [];
+
 void gbemu::update ()
 {
 	int cycles_this_update = 0;
@@ -8,22 +10,17 @@ void gbemu::update ()
 	{
 		int cycles;
 		
-		if (!halted) cycles = exec ();
-		else cycles = 4;
+		cycles = exec ();
 		
 		//cout << "pending_clear_ime:  " << pending_clear_ime 
 			//<< " pending_set_ime:  " << pending_set_ime << "\n";
 		
 		if ( pending_clear_ime /*&& op_read (pc-1) != 0xf3*/ )
-		{
-			//cout << "Clearing the IME.\n";
-			
+		{	
 			pending_clear_ime = false; ime = false;
 		}
 		if ( pending_set_ime /*&& op_read (pc-1) != 0xfb*/ )
 		{
-			//cout << "Setting the IME.\n";
-			
 			pending_set_ime = false; ime = true;
 		}
 		
@@ -32,12 +29,12 @@ void gbemu::update ()
 		update_gfx (cycles);
 		do_interrupts ();
 		
-		#ifdef update_debug
-		cout << "cycles_this_update:  " << cycles_this_update << "\n";
-		#endif // update_debug
+		//#ifdef update_debug
+		//cout << "cycles_this_update:  " << cycles_this_update << "\n";
+		//#endif // update_debug
 		
 	}
-	//render_screen ();
+	//render_screen ();  // it was a dummy function anyway
 }
 
 void gbemu::run_game ()
@@ -97,22 +94,37 @@ void gbemu::run_game ()
 
 void gbemu::update_timers ( int cycles )
 {
+	divclksleft -= cycles;
 	
-}
-
-void gbemu::do_divreg ( int cycles )
-{
+	if ( divclksleft<=0 ) { divclksleft = divclks; ++gbram [ioreg::divreg]; }
 	
+	if ( test_bit ( gbram [ioreg::tmrctrl], 2 ) )
+	{
+		tmrclksleft -= cycles;
+		
+		if ( tmrclksleft<=0 )
+		{
+			if ( gbram [ioreg::tmrcount]==0xff )
+			{
+				gbram [ioreg::tmrcount] = gbram [ioreg::tmrmod];
+				request_int (2);
+			}
+			else
+				++gbram [ioreg::tmrcount];
+			
+			tmrclksleft = tmrclks [ gbram [ioreg::tmrctrl]&0x03 ];
+		}
+	}
 }
 
 void gbemu::do_interrupts ()
 {
-	#ifdef int_debug //disabling this
-	cout << "We are in the do_interrupts () function.\n";
-	cout << "Interrupt Master Enable:  " << ime << ".\n";
-	cout << "gbram [ioreg::intreq]:  " 
-		<< hex << (int)gbram [ioreg::intreq] << dec << ".\n";
-	#endif //int_debug
+	//#ifdef int_debug //disabling this
+	//cout << "We are in the do_interrupts () function.\n";
+	//cout << "Interrupt Master Enable:  " << ime << ".\n";
+	//cout << "gbram [ioreg::intreq]:  " 
+		//<< hex << (int)gbram [ioreg::intreq] << dec << ".\n";
+	//#endif //int_debug
 	
 	if ( ime==true && gbram [ioreg::intreq]>0 )
 	{
@@ -131,6 +143,7 @@ void gbemu::service_int ( int which_int )
 	cout << "We are servicing interrupt " << which_int << ".\n";
 	#endif //int_debug
 	
+	if (halted) { halted = false; ++pc; }
 	
 	ime = false;
 	
@@ -143,6 +156,7 @@ void gbemu::service_int ( int which_int )
 		case 0:  pc = 0x40; break;
 		case 1:  pc = 0x48; break;
 		case 2:  pc = 0x50; break;
+		//case 3:  pc = 0x58; break;  // not doing that stuff yet
 		case 4:  pc = 0x60; break;
 	}
 	

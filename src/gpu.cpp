@@ -106,6 +106,7 @@ void gpu::render_bg ()
 {
 	// this code is borrowed from another emulator so I can better test the CPU core
 	// I am using Blargg's test ROMs for that
+	// I am eventually going to write my own code for this function
 	
 	#define BYTE u8
 	#define SIGNED_BYTE s8

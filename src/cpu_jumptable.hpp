@@ -1,22 +1,34 @@
 #ifndef cpu_jumptable_hpp
 #define cpu_jumptable_hpp
 
+void cpu::print_undefined ( u8 opcode )
+{
+	cout << "Warning:  At PC address 0x" << (int)pc << " Undefined Opcode (0x" 
+		<< hex << (int)opcode << dec << ").  Executing NOP Instead.\n";
+	op_nop ();
+	cout << "Executing infinite loop for logging purposes....\n";
+	for (;;);
+}
+
 int cpu::exec ()
 {
 	u8 opcode = op_read (pc);
 	
 	#ifdef cpu_debug
-	cout << "Executing opcode 0x" << hex;
-	if ( opcode<0x10 ) 
-		cout << "0";
-	cout << (int)opcode << " at PC address 0x"; 
-	if ( pc<0x10 ) 
-		cout << "000"; 
-	else if ( pc<0x100 ) 
-		cout << "00";
-	else if ( pc<0x1000 ) 
-		cout << "0";
-	cout << pc << dec << ".\n";
+	//if ( opcode!=0x76 )
+	{
+		cout << "Executing opcode 0x" << hex;
+		if ( opcode<0x10 ) 
+			cout << "0";
+		cout << (int)opcode << " at PC address 0x"; 
+		if ( pc<0x10 ) 
+			cout << "000"; 
+		else if ( pc<0x100 ) 
+			cout << "00";
+		else if ( pc<0x1000 ) 
+			cout << "0";
+		cout << pc << dec << ".\n";
+	}
 	#endif
 	
 	// the return value is the number of cycles
@@ -25,6 +37,13 @@ int cpu::exec ()
 	{
 		case 0x00:
 			op_nop ();
+			if ( op_read (pc-1)==0x00 && op_read (pc-2)==0x00 
+				&& pc!=0x101 && pc!=0x102 )
+			{
+				cout << "Error:  Too many NOPs.  Executing infinite loop.\n";
+				for (;;);
+			}
+			
 			return 4;
 		case 0x01:
 			op_load_rr_nn (bc.w);
@@ -656,9 +675,7 @@ int cpu::exec ()
 			op_jp_f_nn (nc);
 			return 12;
 		case 0xd3:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xd4:
 			op_call_f_nn (nc);
@@ -682,17 +699,13 @@ int cpu::exec ()
 			op_jp_f_nn (c);
 			return 12;
 		case 0xdb:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xdc:
 			op_call_f_nn (c);
 			return 12;
 		case 0xdd:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xde:
 			op_sbc_n ();
@@ -710,14 +723,10 @@ int cpu::exec ()
 			op_load_io_c_a ();
 			return 8;
 		case 0xe3:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xe4:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xe5:
 			op_push_rr (hl);
@@ -738,19 +747,13 @@ int cpu::exec ()
 			op_load_mem_imm_a ();
 			return 16;
 		case 0xeb:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xec:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xed:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xee:
 			op_xor_n ();
@@ -771,9 +774,7 @@ int cpu::exec ()
 			op_di ();
 			return 4;
 		case 0xf4:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xf5:
 			op_push_rr (af);
@@ -797,14 +798,10 @@ int cpu::exec ()
 			op_ei ();
 			return 4;
 		case 0xfc:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xfd:
-			cout << "Warning:  Undefined Opcode (0x" << hex << opcode << dec 
-				<< ").  Executing NOP Instead.\n";
-			op_nop ();
+			print_undefined (opcode);
 			return 0;
 		case 0xfe:
 			op_cp_n ();

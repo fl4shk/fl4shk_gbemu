@@ -51,8 +51,9 @@ public:  // functions
 	no_fcall void set_cflag (); no_fcall void clear_cflag (); 
 	no_fcall bool get_cflag () const;
 	
-	no_fcall void op_xx ();
-	no_fcall void op_cb ();
+	//no_fcall void op_xx ();
+	//no_fcall void op_cb ();
+	no_fcall void print_undefined ( u8 opcode );
 	
 	// load commands
 	no_fcall void op_load_r_r ( u8 &r1, u8 r2 ); 

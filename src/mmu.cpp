@@ -21,9 +21,6 @@ void mmu::op_write ( u16 addr, u8 data )
 		//handle_banking ();
 	}
 	
-	// TO --NOT-- DO Again:  Confuse addr<0xa000 with working with external RAM 
-	// (AWFUL bug!)
-	
 	else if ( addr<0xa000 )		// if we are doing stuff to VRAM
 	{
 		//cout << "Attempting to write to VRAM.... ";

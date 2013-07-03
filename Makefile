@@ -1,13 +1,13 @@
 # [Insert witty comment here]
 
 all: 
-		make -C src/
+		+make -C src/
 
 clean:  
-		make clean -C src/
+		+make clean -C src/
 
 objclean:
-		make objclean -C src/
+		+make objclean -C src/
 
 rebuild:
-		make clean && make
+		+make clean && make

@@ -94,14 +94,6 @@ void cpu::op_load_io_n_a ()
 
 void cpu::op_load_a_hli ()
 {
-	if ( pc==0xc0cd && false )
-	{
-		cout << hex << "Executing ldi a,(hl) at PC address 0xc0cd" << endl;
-		cout << "hl:  " << hl.w << "  (hl):  " << (int)op_read (hl.w) << dec
-			<< endl;
-		
-	}
-	
 	pc++; af.hi = op_read (hl.w); hl.w++;
 }
 
@@ -163,6 +155,10 @@ void cpu::op_load_mem_imm_sp ()
 void cpu::op_push_rr ( cpureg rr )		// This is actually an instruction
 {
 	pc++; op_push_word (rr);
+	
+	#ifdef cpu_debug
+	cout << hex << "rr.w:  " << rr.w << dec << "\n";
+	#endif // cpu_debug
 }
 
 void cpu::op_pop_rr ( cpureg &rr )		// This is actually an instruction
@@ -172,6 +168,10 @@ void cpu::op_pop_rr ( cpureg &rr )		// This is actually an instruction
 
 void cpu::op_push_word ( cpureg rr )		// This is not an instruction
 {
+	#ifdef cpu_debug
+	cout << hex << "rr.w:  " << rr.w << dec << "\n";
+	#endif // cpu_debug
+	
 	--sp; op_write ( sp, rr.hi );
 	--sp; op_write ( sp, rr.lo );
 }
@@ -185,6 +185,7 @@ void cpu::op_pop_word ( cpureg &rr )		// This is not an instruction
 	}
 	else
 	{
+		cout << "Error, SP is greater than 0xfffe.\n";
 		// error, not sure what to do...
 	}
 }
@@ -484,7 +485,19 @@ void cpu::op_inc_hl_mem ()
 
 void cpu::op_inc_rr ( u16 &rr )
 {
-	pc++; rr++;
+	pc++; 
+	//rr++;
+	
+	static cpureg temp; temp.w = rr;
+	
+	if ( ( temp.hi==0xff )&&( temp.lo==0xff ) ) { temp.hi = 0; temp.lo = 0; }
+	else
+	{
+		if ( temp.lo==0xff ) { temp.lo = 0; ++temp.hi; }
+		else ++temp.lo;
+	}
+	
+	rr = temp.w;
 }
 
 void cpu::op_dec_r ( u8 &r )
@@ -521,7 +534,19 @@ void cpu::op_dec_hl_mem ()  // next
 
 void cpu::op_dec_rr ( u16 &rr )
 {
-	pc++; rr++;
+	pc++; 
+	//rr++;
+	
+	static cpureg temp; temp.w = rr;
+	
+	if ( ( temp.hi==0 )&&( temp.lo==0 ) ) { temp.hi = 0xff; temp.lo = 0xff; }
+	else
+	{
+		if ( temp.lo==0 ) { temp.lo = 0xff; --temp.hi; }
+		else --temp.lo;
+	}
+	
+	rr = temp.w;
 }
 
 void cpu::op_add_sp_dd ()
@@ -1028,8 +1053,13 @@ void cpu::op_nop ()	// seeing as NOP is short for No OPeration, this does NOTHIN
 
 void cpu::op_halt ()
 {
-	pc++;
-	halted = true;
+	if (ime)
+		halted = true;
+	else
+	{
+		pc++;
+		//haltbug = true;	// (not yet implemented)
+	}
 }
 
 void cpu::op_stop ()
@@ -1212,8 +1242,11 @@ void cpu::op_ret_f ( jump_cndtn f )
 void cpu::op_reti ()
 {
 	// We don't need the pc++ here
-	op_pop_word (pc);
+	cpureg temp; temp.w = pc;
+	op_pop_rr (temp);
+	pc = temp.w;
 	ime = true;
+	
 }
 
 void cpu::op_rst ( u8 nn )

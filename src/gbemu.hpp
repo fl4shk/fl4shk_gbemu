@@ -15,10 +15,11 @@ enum gbtype { dmg, sgb, cgb, agb };
 struct gbemu : public cpu, public mmu, public gpu
 {
 public:  // variables
-	static const int divclks = 256, tmr00clks = 1024, tmr01clks = 16, tmr10clks = 64,
-		tmr11clks = 256;
+	static const int divclks = 256; 
+	static constexpr int tmrclks [] = { 1024, 16, 64, 256 };
 	
-	int divclksleft, tmrclksleft; //, clear_ime_clks, set_ime_clks
+	int divclksleft, tmrclksleft;
+	//, clear_ime_clks, set_ime_clks	// going to do this at some point
 	
 	gbtype emumode;
 	
@@ -46,8 +47,7 @@ public:  // functions
 	{
 		cpu::reset (); mmu::reset (); gpu::reset ();
 		
-		// still need to do timer and divider register stuffs
-		//divclksleft = divclks; tmrclksleft = 
+		divclksleft = divclks; tmrclksleft = tmrclks [0];
 		
 		switch (emumode)
 		{
