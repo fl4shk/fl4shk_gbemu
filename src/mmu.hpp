@@ -18,6 +18,8 @@ public:  // functions
 	virtual u8 get_lcd_mode () = 0;
 	virtual u16 get_pc () = 0;
 	
+	virtual void pr () = 0;
+	
 	virtual void reset ();
 	
 	void handle_banking ();

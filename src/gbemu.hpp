@@ -39,6 +39,7 @@ public:  // functions
 	void op_free_write ( u16 addr, u8 data ) { mmu::op_free_write ( addr, data ); }
 	
 	u16 get_pc () { return pc; }
+	void pr () { cpu::pr (); }
 	
 	// The cpu::reset and mmu::reset functions are DMG-based,
 	// so we need to do some extra stuff in the gbemu::reset function.

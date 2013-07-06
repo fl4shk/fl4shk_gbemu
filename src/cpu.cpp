@@ -155,10 +155,6 @@ void cpu::op_load_mem_imm_sp ()
 void cpu::op_push_rr ( cpureg rr )		// This is actually an instruction
 {
 	pc++; op_push_word (rr);
-	
-	#ifdef cpu_debug
-	cout << hex << "rr.w:  " << rr.w << dec << "\n";
-	#endif // cpu_debug
 }
 
 void cpu::op_pop_rr ( cpureg &rr )		// This is actually an instruction
@@ -168,10 +164,6 @@ void cpu::op_pop_rr ( cpureg &rr )		// This is actually an instruction
 
 void cpu::op_push_word ( cpureg rr )		// This is not an instruction
 {
-	#ifdef cpu_debug
-	cout << hex << "rr.w:  " << rr.w << dec << "\n";
-	#endif // cpu_debug
-	
 	--sp; op_write ( sp, rr.hi );
 	--sp; op_write ( sp, rr.lo );
 }
@@ -228,21 +220,6 @@ void cpu::op_add_n ()
 	u8 n = op_read (pc);
 	
 	op_add_r (n);
-	
-	//pc++;
-	//
-	//if ( ( ( af.hi&0x0f )+( n&0x0f ) )>0x0f ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//if ( ( af.hi+n )>0xff ) set_cflag ();
-	//else clear_cflag ();
-	//
-	//af.hi = ( ( af.hi+n )&0xff );
-	//
-	//if ( af.hi == 0 ) set_zflag ();
-	//else clear_zflag ();
-	//
-	//clear_nflag ();
 }
 
 void cpu::op_add_hl_mem ()
@@ -251,46 +228,44 @@ void cpu::op_add_hl_mem ()
 	u8 n = op_read (hl.w);
 	
 	op_add_r (n);
-	
-	//if ( ( ( af.hi&0x0f )+( n&0x0f ) )>0x0f ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//if ( ( af.hi+n )>0xff ) set_cflag ();
-	//else clear_cflag ();
-	//
-	//af.hi = ( ( af.hi+n )&0xff );
-	//
-	//if ( af.hi == 0 ) set_zflag ();
-	//else clear_zflag ();
-	//
-	//clear_nflag ();
 }
 
 void cpu::op_add_hl_rr ( u16 rr )
 {
 	pc++;
 	
+	u16 before = hl.w;
+	
+	hl.w += rr;
+	
 	clear_nflag ();
 	
-	static uint temp_hl_val = (uint)hl.w, val_to_add = (uint)rr;
+	if ( ( before+rr )>0xffff ) set_cflag ();
+	else clear_cflag ();
 	
-	if ( ( temp_hl_val&0xfff )+( val_to_add&0xfff )>4095 ) 
-		set_hflag ();
-	else 
-		clear_hflag ();
-	if ( ( temp_hl_val+val_to_add ) > 65535 ) 
-		set_cflag (); 
-	else 
-		clear_cflag ();
-	temp_hl_val = ( ( temp_hl_val+val_to_add )&0xffff );
-	hl.w = (u16)temp_hl_val;
+	
+	
+	//clear_nflag ();
+	//
+	//static uint temp_hl_val = (uint)hl.w, val_to_add = (uint)rr;
+	//
+	//if ( ( temp_hl_val&0xfff )+( val_to_add&0xfff )>4095 ) 
+		//set_hflag ();
+	//else 
+		//clear_hflag ();
+	//if ( ( temp_hl_val+val_to_add ) > 65535 ) 
+		//set_cflag (); 
+	//else 
+		//clear_cflag ();
+	//temp_hl_val = ( ( temp_hl_val+val_to_add )&0xffff );
+	//hl.w = (u16)temp_hl_val;
 }
 
 void cpu::op_adc_r ( u8 r )
 {
 	pc++; 
 	
-	int temp, flag_c;
+	static int temp, flag_c;
 	if ( get_cflag ()==0 ) flag_c = 0;
 	else flag_c = 1;
 	
@@ -317,27 +292,6 @@ void cpu::op_adc_n ()
 	u8 n = op_read (pc);
 	
 	op_adc_r (n);
-	
-	//pc++;
-	//
-	//int temp, flag_c;
-	//if ( get_cflag ()==0 ) flag_c = 0;
-	//else flag_c = 1;
-	//
-	//temp = af.hi+n+flag_c;
-	//
-	//clear_nflag ();
-	//
-	//if ( temp>0xff ) set_cflag ();
-	//else clear_cflag ();
-	//
-	//if ( ( ( af.hi&0x0f )+( n&0x0f )+flag_c )>0x0f ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//af.hi = ( temp&0xff );
-	//
-	//if ( af.hi == 0 ) set_zflag ();
-	//else clear_zflag ();
 }
 
 void cpu::op_adc_hl_mem ()
@@ -346,27 +300,6 @@ void cpu::op_adc_hl_mem ()
 	u8 n = op_read (hl.w);
 	
 	op_adc_r (n);
-	
-	//int temp, flag_c;
-	//if ( get_cflag ()==0 ) flag_c = 0;
-	//else flag_c = 1;
-	//
-	//
-	//
-	//temp = af.hi+n+flag_c;
-	//
-	//clear_nflag ();
-	//
-	//if ( temp>0xff ) set_cflag ();
-	//else clear_cflag ();
-	//
-	//if ( ( ( af.hi&0x0f )+( n&0x0f )+flag_c )>0x0f ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//af.hi = ( temp&0xff );
-	//
-	//if ( af.hi == 0 ) set_zflag ();
-	//else clear_zflag ();
 }
 
 void cpu::op_sub_r ( u8 r )
@@ -391,18 +324,7 @@ void cpu::op_sub_n ()
 	
 	op_sub_r (n);
 	
-	//pc++;
-	//
-	//set_nflag ();
-	//
-	//if ( af.hi==n ) set_zflag ();
-	//else clear_zflag ();
-	//
-	//if ( ( af.hi&0x0f )<( n&0x0f ) ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//if ( af.hi<n ) { af.hi = ( 256 - ( n-af.hi ) ); set_cflag (); }
-	//else { af.hi -= n; clear_cflag (); }
+	
 }
 
 void cpu::op_sub_hl_mem ()
@@ -705,7 +627,7 @@ void cpu::op_rlca ()
 	if ( temp==0 )
 	{
 		clear_cflag ();
-		af.hi &= 0xf7;		// restore old bit 7 into bit 0
+		af.hi &= 0xfe;		// restore old bit 7 into bit 0
 	}
 	else
 	{
@@ -787,7 +709,7 @@ void cpu::op_rlc_r ( u8 &r )
 	r <<= 1;
 	
 	// now restore old bit 7 (held in cflag) into bit 0
-	if ( get_cflag ()==0 ) r &= 0x7f;
+	if ( get_cflag ()==0 ) r &= 0xfe;
 	else r |= 0x01;
 	
 	if ( r==0 ) set_zflag ();
@@ -868,7 +790,7 @@ void cpu::op_rr_r ( u8 &r )
 	
 	static u8 temp;
 	temp = r&0x01;		// save old bit 0
-	r >>= 1;	// shift right by 1;
+	r >>= 1;	// shift right by 1
 	if ( get_cflag ()!=0 ) r |= 0x80;		// rotate carry flag into bit 7
 	
 	if ( temp==0 ) clear_cflag ();
@@ -1103,20 +1025,20 @@ void cpu::op_jp_f_nn ( jump_cndtn f )
 	switch (f)
 	{
 		case z:  
-			if ( get_zflag () )
-				pc = hl.w;
+			if ( get_zflag () ) pc = op_read_word (pc);
+			else pc += 2;
 			break;
 		case nz:  
-			if ( !get_zflag () )
-				pc = hl.w;
+			if ( !get_zflag () ) pc = op_read_word (pc);
+			else pc += 2;
 			break;
 		case c:  
-			if ( get_cflag () )
-				pc = hl.w;
+			if ( get_cflag () ) pc = op_read_word (pc);
+			else pc += 2;
 			break;
 		case nc:  
-			if ( !get_cflag () )
-				pc = hl.w;
+			if ( !get_cflag () ) pc = op_read_word (pc);
+			else pc += 2;
 			break;
 		default:  
 			break;

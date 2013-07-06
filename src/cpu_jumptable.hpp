@@ -1,6 +1,15 @@
 #ifndef cpu_jumptable_hpp
 #define cpu_jumptable_hpp
 
+void cpu::pr ()		// print regs
+{
+	cout << hex << "A=0x" << (int)af.hi << "  F=0x" << (int)af.lo
+		<< "  B=0x" << (int)bc.hi << "  C=0x" << (int)bc.lo 
+		<< "  D=0x" << (int)de.hi << "  E=0x" << (int)de.lo
+		<< "  H=0x" << (int)hl.hi << "  L=0x" << (int)hl.lo 
+		<< "  SP=0x" << sp << "  PC=0x" << pc << dec << "\n";
+}
+
 void cpu::print_undefined ( u8 opcode )
 {
 	cout << "Warning:  At PC address 0x" << (int)pc << " Undefined Opcode (0x" 
@@ -14,13 +23,16 @@ int cpu::exec ()
 {
 	u8 opcode = op_read (pc);
 	
+	u8 tempflags = 0;
+	
 	#ifdef cpu_debug
 	//if ( opcode!=0x76 )
+	//if (false)
 	{
-		cout << "Executing opcode 0x" << hex;
+		cout << "Opcode 0x" << hex;
 		if ( opcode<0x10 ) 
 			cout << "0";
-		cout << (int)opcode << " at PC address 0x"; 
+		cout << (int)opcode << " at PC 0x"; 
 		if ( pc<0x10 ) 
 			cout << "000"; 
 		else if ( pc<0x100 ) 
@@ -38,7 +50,7 @@ int cpu::exec ()
 		case 0x00:
 			op_nop ();
 			if ( op_read (pc-1)==0x00 && op_read (pc-2)==0x00 
-				&& pc!=0x101 && pc!=0x102 )
+				&& pc!=0x101 && pc!=0x102 && false )
 			{
 				cout << "Error:  Too many NOPs.  Executing infinite loop.\n";
 				for (;;);
@@ -328,6 +340,14 @@ int cpu::exec ()
 			op_load_r_hl_mem (de.lo);
 			return 8;
 		case 0x5f:
+			//if ( pc==0x2a )
+			//{
+				//cout<<"Before \"ld e, a\", e=0x"<<hex<<(int)de.lo<<dec<<endl;
+				//op_load_r_r ( de.lo, af.hi );
+				//cout<<"After \"ld e, a\", e=0x"<<hex<<(int)de.lo<<dec<<endl;
+				//int d; cin >> d;
+			//}
+			//else 
 			op_load_r_r ( de.lo, af.hi );
 			return 4;
 		case 0x60:
@@ -717,6 +737,14 @@ int cpu::exec ()
 			op_load_io_n_a ();
 			return 12;
 		case 0xe1:
+			//if ( pc==0x29 )
+			//{
+				//cout<<"Before \"pop hl\", hl=0x"<<hex<<hl.w<<dec<<endl;
+				//op_pop_rr (hl);
+				//cout<<"After \"pop hl\", hl=0x"<<hex<<hl.w<<dec<<endl;
+				//int d; cin >> d;
+			//}
+			//else 
 			op_pop_rr (hl);
 			return 12;
 		case 0xe2:
@@ -765,7 +793,9 @@ int cpu::exec ()
 			op_load_a_io_n ();
 			return 12;
 		case 0xf1:
+			//tempflags = af.lo;
 			op_pop_rr (af);
+			af.lo = 0;
 			return 12;
 		case 0xf2:
 			op_load_a_io_c ();
@@ -828,8 +858,6 @@ int cpu::exec_cb ()
 	#ifdef cpu_debug
 	cout << "Executing CB-prefixed opcode 0x" << hex << (int)opcode << dec << ".\n";
 	#endif
-	
-	// TO DO:  put actual number of cycles for each return value
 	
 	switch (opcode)
 	{

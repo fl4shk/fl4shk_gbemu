@@ -2,8 +2,8 @@
 #define include_hpp
 
 #include <iostream>
-#include <string>		// I don't know why this is here
-#include <fstream>		// "                           "
+#include <string>
+#include <fstream>		// I don't know why this is here
 #include <string.h>		// This is only needed for mmu::load_game ()
 using namespace std;
 
@@ -40,6 +40,7 @@ template < typename t > void print ( t val ) { cout << val; }
 template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 //void println () { cout << endl; }
 
+// (disregard the following debugging stuff; it is being removed)
 // Uncomment these to compile debugging stuff into the emulator
 //#define cpu_debug
 //#define mmu_debug

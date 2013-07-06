@@ -23,6 +23,8 @@ public:  // functions
 	virtual void op_free_write ( u16 addr, u8 data ) = 0;
 	virtual void request_int ( int which_int ) = 0;
 	
+	virtual void pr () = 0;
+	
 	virtual void reset ();
 	
 	void update_gfx ( int cycles );

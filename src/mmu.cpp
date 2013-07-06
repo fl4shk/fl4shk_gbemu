@@ -14,7 +14,6 @@ u16 mmu::op_read_word ( u16 addr )
 
 void mmu::op_write ( u16 addr, u8 data )
 {
-	
 	// Not going to be handling banking just yet
 	if ( addr<0x8000 )
 	{
