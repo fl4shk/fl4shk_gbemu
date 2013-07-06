@@ -457,18 +457,18 @@ void cpu::op_dec_hl_mem ()  // next
 void cpu::op_dec_rr ( u16 &rr )
 {
 	pc++; 
-	//rr++;
+	rr--;
 	
-	static cpureg temp; temp.w = rr;
-	
-	if ( ( temp.hi==0 )&&( temp.lo==0 ) ) { temp.hi = 0xff; temp.lo = 0xff; }
-	else
-	{
-		if ( temp.lo==0 ) { temp.lo = 0xff; --temp.hi; }
-		else --temp.lo;
-	}
-	
-	rr = temp.w;
+	//static cpureg temp; temp.w = rr;
+	//
+	//if ( ( temp.hi==0 )&&( temp.lo==0 ) ) { temp.hi = 0xff; temp.lo = 0xff; }
+	//else
+	//{
+		//if ( temp.lo==0 ) { temp.lo = 0xff; --temp.hi; }
+		//else --temp.lo;
+	//}
+	//
+	//rr = temp.w;
 }
 
 void cpu::op_add_sp_dd ()

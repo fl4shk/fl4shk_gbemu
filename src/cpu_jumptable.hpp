@@ -795,7 +795,7 @@ int cpu::exec ()
 		case 0xf1:
 			//tempflags = af.lo;
 			op_pop_rr (af);
-			af.lo = 0;
+			af.lo &= 0xf0;
 			return 12;
 		case 0xf2:
 			op_load_a_io_c ();
