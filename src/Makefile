@@ -1,7 +1,7 @@
 # [Insert witty comment here]
 
 cc=g++
-cflags=-std=c++0x -Wall -g -c
+cflags=-std=c++0x -Wall -g -c -fno-exceptions
 lflags=-lsfml-graphics -lsfml-window -lsfml-audio -lsfml-network -lsfml-system
 compile=$(cc) $(cflags)
 
@@ -30,3 +30,6 @@ clean:
 
 objclean:
 		rm -rf *.o
+
+rebuild:
+		make -C .. rebuild

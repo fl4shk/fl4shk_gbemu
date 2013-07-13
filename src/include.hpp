@@ -1,10 +1,11 @@
 #ifndef include_hpp
 #define include_hpp
 
-#include <iostream>
-#include <string>
+#include <iostream>		// This is eventually going to be killed off
+#include <string>		// This might eventually be used for ROMs not called game.gb
 #include <fstream>		// I don't know why this is here
 #include <string.h>		// This is only needed for mmu::load_game ()
+#include <stdio.h>		// I intend to replace <iostream> with this
 using namespace std;
 
 #include <SFML/Graphics.hpp>
@@ -53,6 +54,11 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 //#define cgb_ir_debug		// gbc infrared communication debugging
 //#define update_debug
 
+#ifdef cpu_debug
+	#undef no_fcall
+	#define no_fcall
+#endif // cpu_debug
+	
 namespace ioreg
 {
 	const int joy1 = 0xff00, serial = 0xff01, siocnt = 0xff02, divreg = 0xff04, 
@@ -75,5 +81,26 @@ union cpureg { u16 w; struct { u8 lo, hi; }; };
 enum jump_cndtn { z, nz, c, nc };	// jump condition
 
 #include "bit_funcs.hpp"
+
+//class delay_cls
+//{
+//private:  // variables
+	//sf::Clock clk;
+	//
+//public:  // functions
+	//no_fcall void operator () ( float seconds )
+	//{
+		//clk.restart (); while ( clk.getElapsedTime ().asSeconds ()<seconds );
+	//}
+	//no_fcall void operator () ( sf::Int32 millis )
+	//{
+		//clk.restart (); while ( clk.getElapsedTime ().asMilliseconds ()<millis );
+	//}
+	//no_fcall void operator () ( sf::Int64 micros )
+	//{
+		//clk.restart (); while ( clk.getElapsedTime ().asMicroseconds ()<micros );
+	//}
+	//
+//};
 
 #endif // include_hpp

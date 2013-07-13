@@ -3,11 +3,14 @@
 
 void cpu::pr ()		// print regs
 {
-	cout << hex << "A=0x" << (int)af.hi << "  F=0x" << (int)af.lo
-		<< "  B=0x" << (int)bc.hi << "  C=0x" << (int)bc.lo 
-		<< "  D=0x" << (int)de.hi << "  E=0x" << (int)de.lo
-		<< "  H=0x" << (int)hl.hi << "  L=0x" << (int)hl.lo 
-		<< "  SP=0x" << sp << "  PC=0x" << pc << dec << "\n";
+	//cout << hex << "  A=0x" << (int)af.hi << " F=0x" << (int)af.lo
+		//<< " B=0x" << (int)bc.hi << " C=0x" << (int)bc.lo 
+		//<< " D=0x" << (int)de.hi << " E=0x" << (int)de.lo
+		//<< " H=0x" << (int)hl.hi << " L=0x" << (int)hl.lo 
+		//<< " SP=0x" << sp << " PC=0x" << pc << dec << "\n";
+	printf ( "  A=0x%x F=0x%x B=0x%x C=0x%x D=0x%x E=0x%x H=0x%x L=0x%x SP=0x%x PC=0x%x", 
+		af.hi, af.lo, bc.hi, bc.lo, de.hi, de.lo, hl.hi, hl.lo, sp, pc );
+	printf ("\n");
 }
 
 void cpu::print_undefined ( u8 opcode )
@@ -21,49 +24,43 @@ void cpu::print_undefined ( u8 opcode )
 
 int cpu::exec ()
 {
-	u8 opcode = op_read (pc);
-	
-	u8 tempflags = 0;
-	
 	#ifdef cpu_debug
-	//if ( opcode!=0x76 )
 	//if (false)
 	{
-		cout << "Opcode 0x" << hex;
-		if ( opcode<0x10 ) 
-			cout << "0";
-		cout << (int)opcode << " at PC 0x"; 
-		if ( pc<0x10 ) 
-			cout << "000"; 
-		else if ( pc<0x100 ) 
-			cout << "00";
-		else if ( pc<0x1000 ) 
-			cout << "0";
-		cout << pc << dec << ".\n";
+		printf ("Opcode 0x");
+		if ( op_read (pc)<0x10 ) 
+			printf ("0");
+		printf ( "%x", op_read (pc) );
+		
+		if ( op_read (pc)!=0xcb )
+			pr ();
 	}
 	#endif
+	
+	opcode = op_read (pc);
 	
 	// the return value is the number of cycles
 	
 	switch (opcode)
 	{
-		case 0x00:
+		case 0x00:		// success
 			op_nop ();
-			if ( op_read (pc-1)==0x00 && op_read (pc-2)==0x00 
-				&& pc!=0x101 && pc!=0x102 && false )
-			{
-				cout << "Error:  Too many NOPs.  Executing infinite loop.\n";
-				for (;;);
-			}
+			
+			//if ( op_read (pc-1)==0x00 && op_read (pc-2)==0x00 
+				//&& pc!=0x101 && pc!=0x102 && false )
+			//{
+				//cout << "Error:  Too many NOPs.  Executing infinite loop.\n";
+				//for (;;);
+			//}
 			
 			return 4;
-		case 0x01:
+		case 0x01:		// success
 			op_load_rr_nn (bc.w);
 			return 12;
-		case 0x02:
+		case 0x02:		// success
 			op_load_rr_mem_a (bc.w);
 			return 8;
-		case 0x03:
+		case 0x03:		// success
 			op_inc_rr (bc.w);
 			return 8;
 		case 0x04:
@@ -111,14 +108,14 @@ int cpu::exec ()
 		case 0x12:
 			op_load_rr_mem_a (de.w);
 			return 8;
-		case 0x13:
+		case 0x13:		// success
 			op_inc_rr (de.w);
 			return 8;
 		case 0x14:
 			op_inc_r (de.hi);
 			return 4;
 		case 0x15:
-			op_dec_r (de.lo);
+			op_dec_r (de.hi);
 			return 4;
 		case 0x16:
 			op_load_r_n (de.hi);
@@ -226,6 +223,7 @@ int cpu::exec ()
 			op_jr_f_n (c);
 			return 8;
 		case 0x39:
+			printf ("Attempting to add SP to HL\n");
 			op_add_hl_rr (sp);
 			return 8;
 		case 0x3a:
@@ -340,14 +338,6 @@ int cpu::exec ()
 			op_load_r_hl_mem (de.lo);
 			return 8;
 		case 0x5f:
-			//if ( pc==0x2a )
-			//{
-				//cout<<"Before \"ld e, a\", e=0x"<<hex<<(int)de.lo<<dec<<endl;
-				//op_load_r_r ( de.lo, af.hi );
-				//cout<<"After \"ld e, a\", e=0x"<<hex<<(int)de.lo<<dec<<endl;
-				//int d; cin >> d;
-			//}
-			//else 
 			op_load_r_r ( de.lo, af.hi );
 			return 4;
 		case 0x60:
@@ -737,14 +727,6 @@ int cpu::exec ()
 			op_load_io_n_a ();
 			return 12;
 		case 0xe1:
-			//if ( pc==0x29 )
-			//{
-				//cout<<"Before \"pop hl\", hl=0x"<<hex<<hl.w<<dec<<endl;
-				//op_pop_rr (hl);
-				//cout<<"After \"pop hl\", hl=0x"<<hex<<hl.w<<dec<<endl;
-				//int d; cin >> d;
-			//}
-			//else 
 			op_pop_rr (hl);
 			return 12;
 		case 0xe2:
@@ -766,6 +748,7 @@ int cpu::exec ()
 			op_rst (0x20);
 			return 32;
 		case 0xe8:
+			printf ("Attempting to add DD to SP\n");
 			op_add_sp_dd ();
 			return 16;
 		case 0xe9:
@@ -793,7 +776,6 @@ int cpu::exec ()
 			op_load_a_io_n ();
 			return 12;
 		case 0xf1:
-			//tempflags = af.lo;
 			op_pop_rr (af);
 			af.lo &= 0xf0;
 			return 12;
@@ -816,6 +798,7 @@ int cpu::exec ()
 			op_rst (0x30);
 			return 32;
 		case 0xf8:
+			printf ("Attempting to load SP+N into HL\n");
 			op_load_hl_sp_n ();
 			return 12;
 		case 0xf9:
@@ -851,13 +834,20 @@ int cpu::exec ()
 }
 
 int cpu::exec_cb ()
-{			
+{	
 	pc++;
-	u8 opcode = op_read (pc);
-	
+			
 	#ifdef cpu_debug
-	cout << "Executing CB-prefixed opcode 0x" << hex << (int)opcode << dec << ".\n";
+	//cout << "CB opcode 0x" << hex << (int)opcode << dec << ".\n";
+	printf ("CB opcode 0x");
+	if ( op_read (pc)<0x10 ) 
+		printf ("0");
+	printf ( "%x", op_read (pc) );
+	
+	pr ();
 	#endif
+	
+	opcode = op_read (pc);
 	
 	switch (opcode)
 	{

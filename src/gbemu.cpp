@@ -66,6 +66,7 @@ void gbemu::run_game ()
 			{
 				if ( event.key.code == kb::A )
 				{
+					#ifdef gpu_debug
 					for ( u16 i=0x8000; i<0xa000; i+=2 )
 					{
 						cout << hex << "addr 0x" << i << ":  0x"
@@ -74,8 +75,12 @@ void gbemu::run_game ()
 							<< (int)op_read (i+1) << endl;
 					}
 					
-					sf::Clock tempclk;
-					while ( tempclk.getElapsedTime ().asSeconds ()<1 ) {}
+					//sf::Clock tempclk;
+					//while ( tempclk.getElapsedTime ().asSeconds ()<1.0f );
+					
+					
+					
+					#endif // gpu_debug
 				}
 				else if ( event.key.code == kb::Escape )
 					app.close ();

@@ -13,6 +13,8 @@ public:  // variables
 	
 	bool halted, stopped, ime, pending_set_ime, pending_clear_ime;
 	
+	u8 opcode;
+	
 	// ram stuff for debugging the CPU core
 	//static const int ram_size = 0x10000;
 	//u8 ram [ram_size];
@@ -24,10 +26,15 @@ public:  // functions
 	~cpu () {}
 	
 	// these functions are declared virtual to assist with multiple inheritance
-	virtual u8 op_read ( u16 addr ) { return 0; };	
-	virtual u16 op_read_word ( u16 addr ) { return 0; };
-	virtual void op_write ( u16 addr, u8 data ) {};
+	virtual u8 op_read ( u16 addr ) = 0;
+	virtual u16 op_read_word ( u16 addr ) = 0;
+	virtual void op_write ( u16 addr, u8 data ) = 0;
+	virtual void op_free_write ( u16 addr, u8 data ) = 0;
 	virtual bool stop () { return true; };
+	
+	virtual u8 r ( u16 addr ) { return op_read (addr); }
+	virtual u16 rw ( u16 addr ) { return op_read_word (addr); }
+	virtual void fw ( u16 addr, u8 data ) { op_free_write ( addr, data ); }
 	
 	virtual void pr ();
 	virtual u16 get_pc () { return pc; }
@@ -35,8 +42,8 @@ public:  // functions
 	// This function is declared virtual because of the multiple inheritance
 	// TO DO:  Implement the differences between the different GB types
 	virtual void reset () 
-		{ af.w = 0x0013; bc.w = 0x00d8; de.w = 0x014d; 
-		hl.w = 0x014d; sp = 0xFFFE; pc = 0x100; ime = true; }
+		{ af.w = 0x11b0; bc.w = 0x0013; de.w = 0x00d8; 
+		hl.w = 0x014d; sp = 0xfffe; pc = 0x100; ime = true; }
 	
 	// I don't think these two functions need to be virtual, but meh
 	virtual int exec ();
