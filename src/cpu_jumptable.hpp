@@ -3,14 +3,37 @@
 
 void cpu::pr ()		// print regs
 {
-	//cout << hex << "  A=0x" << (int)af.hi << " F=0x" << (int)af.lo
-		//<< " B=0x" << (int)bc.hi << " C=0x" << (int)bc.lo 
-		//<< " D=0x" << (int)de.hi << " E=0x" << (int)de.lo
-		//<< " H=0x" << (int)hl.hi << " L=0x" << (int)hl.lo 
-		//<< " SP=0x" << sp << " PC=0x" << pc << dec << "\n";
-	printf ( "  A=0x%x F=0x%x B=0x%x C=0x%x D=0x%x E=0x%x H=0x%x L=0x%x SP=0x%x PC=0x%x", 
-		af.hi, af.lo, bc.hi, bc.lo, de.hi, de.lo, hl.hi, hl.lo, sp, pc );
-	printf ("\n");
+	//printf ( "  PC=0x%x SP=0x%x A=0x%x F=0x%x B=0x%x C=0x%x D=0x%x E=0x%x H=0x%x L=0x%x", 
+		//pc, sp, af.hi, af.lo, bc.hi, bc.lo, de.hi, de.lo, hl.hi, hl.lo );
+	//printf ("\n");
+	
+	printf ("  PC="); 
+	if ( pc<0x10 ) printf ("000");
+	else if ( pc<0x100 ) printf ("00"); 
+	else if ( pc<0x1000 ) printf ("0");
+	printf ( "%X", pc ); 
+	
+	printf (" AF=");
+	if ( af.hi<0x10 ) { printf ("0"); } printf ( "%X", af.hi );
+	if ( af.lo<0x10 ) { printf ("0"); } printf ( "%X", af.lo );
+	
+	printf (" BC=");
+	if ( bc.hi<0x10 ) { printf ("0"); } printf ( "%X", bc.hi );
+	if ( bc.lo<0x10 ) { printf ("0"); } printf ( "%X", bc.lo );
+	
+	printf (" DE=");
+	if ( de.hi<0x10 ) { printf ("0"); } printf ( "%X", de.hi );
+	if ( de.lo<0x10 ) { printf ("0"); } printf ( "%X", de.lo );
+	
+	printf (" HL=");
+	if ( hl.hi<0x10 ) { printf ("0"); } printf ( "%X", hl.hi );
+	if ( hl.lo<0x10 ) { printf ("0"); } printf ( "%X", hl.lo );
+	
+	printf (" SP=");
+	if ( sp<0x10 ) printf ("000");
+	else if ( sp<0x100 ) printf ("00"); 
+	else if ( sp<0x1000 ) printf ("0");
+	printf ( "%X\n", sp ); 
 }
 
 void cpu::print_undefined ( u8 opcode )
@@ -24,16 +47,28 @@ void cpu::print_undefined ( u8 opcode )
 
 int cpu::exec ()
 {
+	//branched = 0;
+	
 	#ifdef cpu_debug
 	//if (false)
+	//if (halted)
 	{
-		printf ("Opcode 0x");
+		printf ("Opcode ");
 		if ( op_read (pc)<0x10 ) 
 			printf ("0");
 		printf ( "%x", op_read (pc) );
 		
 		if ( op_read (pc)!=0xcb )
 			pr ();
+		else
+			printf ("\n");
+		
+		
+		//if ( pc==0xcbb0 )
+		//{
+			//printf ("Executing infinite loop...\n");
+			//for (;;);
+		//}
 	}
 	#endif
 	
@@ -108,7 +143,7 @@ int cpu::exec ()
 		case 0x12:
 			op_load_rr_mem_a (de.w);
 			return 8;
-		case 0x13:		// success
+		case 0x13:
 			op_inc_rr (de.w);
 			return 8;
 		case 0x14:
@@ -223,7 +258,6 @@ int cpu::exec ()
 			op_jr_f_n (c);
 			return 8;
 		case 0x39:
-			printf ("Attempting to add SP to HL\n");
 			op_add_hl_rr (sp);
 			return 8;
 		case 0x3a:
@@ -748,7 +782,6 @@ int cpu::exec ()
 			op_rst (0x20);
 			return 32;
 		case 0xe8:
-			printf ("Attempting to add DD to SP\n");
 			op_add_sp_dd ();
 			return 16;
 		case 0xe9:
@@ -798,7 +831,6 @@ int cpu::exec ()
 			op_rst (0x30);
 			return 32;
 		case 0xf8:
-			printf ("Attempting to load SP+N into HL\n");
 			op_load_hl_sp_n ();
 			return 12;
 		case 0xf9:
@@ -839,12 +871,15 @@ int cpu::exec_cb ()
 			
 	#ifdef cpu_debug
 	//cout << "CB opcode 0x" << hex << (int)opcode << dec << ".\n";
-	printf ("CB opcode 0x");
-	if ( op_read (pc)<0x10 ) 
-		printf ("0");
-	printf ( "%x", op_read (pc) );
-	
-	pr ();
+	//if (false)
+	{
+		printf ("CB opcode ");
+		if ( op_read (pc)<0x10 ) 
+			printf ("0");
+		printf ( "%X", op_read (pc) );
+		
+		pr ();
+	}
 	#endif
 	
 	opcode = op_read (pc);

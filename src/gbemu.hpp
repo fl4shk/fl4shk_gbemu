@@ -23,8 +23,10 @@ public:  // variables
 	
 	gbtype emumode;
 	
+	u8 joyp_state;
+	
 public:  // functions
-	gbemu ( const char *filename )
+	gbemu ( const char *filename )	// I probably ought to add command line arg stuff
 	{
 		load_game (filename);
 		reset ();
@@ -59,15 +61,18 @@ public:  // functions
 	
 	u8 get_lcd_mode () { return gpu::get_lcd_mode (); }
 	
-	void update ();
-	void update_timers ( int cycles );
-	void do_divreg ( int cycles );
+	no_fcall void update ();
+	no_fcall void update_timers ( int cycles );
+	no_fcall void do_divreg ( int cycles );
+	
+	no_fcall void update_joyp ();
+	no_fcall void keypressed ( int key );
+	no_fcall void keyreleased ( int key );
+	no_fcall u8 get_input_state ();
 	
 	void do_interrupts ();
 	void service_int ( int which_int );
 	void request_int ( int which_int );
-	
-	
 	
 };
 

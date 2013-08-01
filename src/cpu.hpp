@@ -11,7 +11,8 @@ public:  // variables
 	static const int max_cycles = 69905,
 		zflag_slot = 7, nflag_slot = 6, hflag_slot = 5, cflag_slot = 4;
 	
-	bool halted, stopped, ime, pending_set_ime, pending_clear_ime;
+	bool halted, stopped, ime, pending_set_ime, pending_clear_ime, branched, 
+		do_cpu_debug;
 	
 	u8 opcode;
 	
@@ -42,8 +43,9 @@ public:  // functions
 	// This function is declared virtual because of the multiple inheritance
 	// TO DO:  Implement the differences between the different GB types
 	virtual void reset () 
-		{ af.w = 0x11b0; bc.w = 0x0013; de.w = 0x00d8; 
-		hl.w = 0x014d; sp = 0xfffe; pc = 0x100; ime = true; }
+		{ af.w = 0x01b0; bc.w = 0x0013; de.w = 0x00d8; 
+		hl.w = 0x014d; sp = 0xfffe; pc = 0x100; ime = true; halted = false; 
+		stopped = false; do_cpu_debug = false; }
 	
 	// I don't think these two functions need to be virtual, but meh
 	virtual int exec ();

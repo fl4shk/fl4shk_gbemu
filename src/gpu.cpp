@@ -280,18 +280,120 @@ void gpu::render_bg ()
 
 void gpu::render_obj ()
 {
-	//u8 lcdctrl = op_read (ioreg::lcdctrl), lcdcy = op_read (ioreg::lcdcy), 
-	//scrolly = op_read (ioreg::scrolly), scrollx = op_read (ioreg::scrollx), 
-	//wndy = op_read (ioreg::wndy), wndx = op_read (ioreg::wndx), 
-	//dmgobjp0 = op_read (ioreg::dmgobjp0), dmgobjp1 = op_read (ioreg::dmgobjp1);
-	//
-	//bool lcd_en = test_bit ( lcdctrl, 7 ), wnd_en = test_bit ( lcdctrl, 5 ), 
-	//obj_en = test_bit ( lcdctrl, 1 );
-	//
-	//u16 wnd_map = test_bit ( lcdctrl, 6 ) ? 0x9c00 : 0x9800,
-	//bg_data = test_bit ( lcdctrl, 4 ) ? 0x8000 : 0x8800,
-	//bg_map = test_bit ( lcdctrl, 3 ) ? 0x9c00 : 0x9800;
+	// This is also borrowed so I can see what the heck is going on with sprites
+	// I will eventually write my own code to this, once I am confident in the CPU core
 	
+	#define BYTE u8
+	#define SIGNED_BYTE s8
+	#define WORD u16
+	#define SIGNED_WORD s16
+	#define ReadMemory op_read
+	#define TestBit test_bit
+	#define BitGetVal test_bit
+	#define COLOUR col_slot
+	#define lcdControl lcdctrl
+	#define WHITE white
+	#define LIGHT_GRAY gray1
+	#define DARK_GRAY gray2
+	#define BLACK black
+	#define GetColour get_color
+	
+	u8 lcdctrl = op_read (ioreg::lcdctrl);
+	
+   bool use8x16 = false ;
+   if (TestBit(lcdControl,2))
+     use8x16 = true ;
+
+   for (int sprite = 0 ; sprite < 40; sprite++)
+   {
+     // sprite occupies 4 bytes in the sprite attributes table
+     BYTE index = sprite*4 ;
+     BYTE yPos = ReadMemory(0xFE00+index) - 16;
+     BYTE xPos = ReadMemory(0xFE00+index+1)-8;
+     BYTE tileLocation = ReadMemory(0xFE00+index+2) ;
+     BYTE attributes = ReadMemory(0xFE00+index+3) ;
+
+     bool yFlip = TestBit(attributes,6) ;
+     bool xFlip = TestBit(attributes,5) ;
+
+     int scanline = ReadMemory(0xFF44);
+
+     int ysize = 8;
+     if (use8x16)
+       ysize = 16;
+
+     // does this sprite intercept with the scanline?
+     if ((scanline >= yPos) && (scanline < (yPos+ysize)))
+     {
+       int line = scanline - yPos ;
+
+       // read the sprite in backwards in the y axis
+       if (yFlip)
+       {
+         line -= ysize ;
+         line *= -1 ;
+       }
+
+       line *= 2; // same as for tiles
+       WORD dataAddress = (0x8000 + (tileLocation * 16)) + line ;
+       BYTE data1 = ReadMemory( dataAddress ) ;
+       BYTE data2 = ReadMemory( dataAddress +1 ) ;
+
+       // its easier to read in from right to left as pixel 0 is
+       // bit 7 in the colour data, pixel 1 is bit 6 etc...
+       for (int tilePixel = 7; tilePixel >= 0; tilePixel--)
+       {
+         int colourbit = tilePixel ;
+         // read the sprite in backwards for the x axis
+         if (xFlip)
+         {
+           colourbit -= 7 ;
+           colourbit *= -1 ;
+         }
+
+         // the rest is the same as for tiles
+         int colourNum = BitGetVal(data2,colourbit) ;
+         colourNum <<= 1;
+         colourNum |= BitGetVal(data1,colourbit) ;
+
+         WORD colourAddress = TestBit(attributes,4)?0xFF49:0xFF48 ;
+         COLOUR col=GetColour(colourNum, colourAddress ) ;
+
+         // white is transparent for sprites.
+         if (col == WHITE)
+           continue ;
+
+         int red = 0;
+         int green = 0;
+         int blue = 0;
+
+         switch(col)
+         {
+           case WHITE: red =0xff;green=0xff;blue=0xff;break ;
+           case LIGHT_GRAY:red =0xCC;green=0xCC ;blue=0xCC;break ;
+           case DARK_GRAY:red=0x77;green=0x77;blue=0x77;break ;
+           case BLACK:red=0x00;green=0x00;blue=0x00;break ;
+         }
+
+         int xPix = 0 - tilePixel ;
+         xPix += 7 ;
+
+         int pixel = xPos+xPix ;
+
+         // sanity check
+         if ((scanline<0)||(scanline>143)||(pixel<0)||(pixel>159))
+         {
+           continue ;
+         }
+         
+         screen [scanline*hres+pixel] = color ( red, green, blue );
+         
+         //m_ScreenData[pixel][scanline][0] = red ;
+         //m_ScreenData[pixel][scanline][1] = green ;
+         //m_ScreenData[pixel][scanline][2] = blue ;         
+       }
+     }
+   }
 }
 
 col_slot gpu::get_color ( u8 color_num, u16 addr )

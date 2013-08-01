@@ -1,7 +1,7 @@
 # [Insert witty comment here]
 
 cc=g++
-cflags=-std=c++0x -Wall -g -c -fno-exceptions
+cflags=-std=c++0x -Wall -O3 -g -c -fno-exceptions
 lflags=-lsfml-graphics -lsfml-window -lsfml-audio -lsfml-network -lsfml-system
 compile=$(cc) $(cflags)
 

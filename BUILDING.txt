@@ -5,5 +5,7 @@ SFML 2.0 is a dependency (along with whatever its dependencies are).  Linux Mint
 and Ubuntu 13.04 do not ship with SFML 2.0 in their repositories.  If you are using 
 either of those distros, you will probably have to compile it yourself.
 
-The following guide is easy to use for compiling SFML 2.0 on recent Linux distros.  I have only done this on Linux Mint 13 and Linux Mint 15, but doing this on other distros should be easy.
+The following guide is easy to use for compiling SFML 2.0 on recent Linux distros. 
 https://sfmlcoder.wordpress.com/2011/08/16/building-sfml-2-0-with-make-for-gcc/
+I have only done this on Linux Mint 13 and Linux Mint 15, but doing this on other distros 
+should be easy.  There are also guides for compiling SFML 2.0 for Windows at that site.

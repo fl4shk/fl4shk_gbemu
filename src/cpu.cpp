@@ -1,5 +1,7 @@
 #include "cpu.hpp"
 
+//constexpr int cpu::
+
 void cpu::set_zflag () { set_bit ( af.lo, zflag_slot ); }
 void cpu::clear_zflag () { clear_bit ( af.lo, zflag_slot ); }
 bool cpu::get_zflag () const { return test_bit ( af.lo, zflag_slot ); }
@@ -129,16 +131,30 @@ void cpu::op_load_sp_hl ()
 void cpu::op_load_hl_sp_n ()
 {
 	pc++; s8 n = op_read (pc); pc++;
-	hl.w = sp+(s16)n;
 	
 	clear_zflag (); clear_nflag ();
 	
-	u16 htest = ( sp&0xf );
-	htest += ( n&0xf );
+	int offset = (int)n, temp;
+	temp = (int)sp + offset;
+	hl.w = temp;
 	
-	if ( htest>0xf ) set_hflag ();
+	if ( offset>=0 )
+	{
+		if ( ( sp&0xff )+offset>0xff ) set_cflag ();
+		else clear_cflag ();
+		
+		if ( ( sp&0x0f )+( offset&0x0f )>0x0f ) set_hflag ();
+		else clear_hflag ();
+	}
+	else // if ( offset<0 )
+	{
+		if ( ( temp&0xff )<=( sp&0xff ) ) set_cflag ();
+		else clear_cflag ();
+		
+		if ( ( temp&0x0f )<=( sp&0x0f ) ) set_hflag ();
+		else clear_hflag ();
+	}
 	
-	if ( ( sp+n )>0xff ) set_cflag ();
 }
 
 void cpu::op_load_mem_imm_sp ()
@@ -234,36 +250,23 @@ void cpu::op_add_hl_rr ( u16 rr )
 {
 	pc++;
 	
+	clear_nflag ();
+	
 	cpureg temp; temp.w = rr;
 	
 	int result = (int)hl.w + (int)rr;
 	
-	clear_nflag ();
-	
-	int c = (int)hl.lo + (int)temp.lo;
+	int c = (int)hl.lo+(int)temp.lo;
 	if ( c>0xff ) c = 1;
 	else c = 0;
 	
-	if ( ( ( hl.hi&0x0f )+( hl.hi&0x0f )+c )&0x10 ) set_hflag ();
+	if ( ( ( hl.hi&0x0f )+( temp.hi&0x0f )+c )&0x10 ) set_hflag ();
 	else clear_hflag ();
 	
 	if ( result>0xffff ) set_cflag ();
 	else clear_cflag ();
 	
 	hl.w = result;
-	
-	//clear_nflag ();
-	//
-	//static uint temphlval = hl.w;
-	//
-	//if ( ( temphlval&0x0fff )+( rr&0xfff )>4095 ) set_hflag ();
-	//else clear_hflag ();
-	//
-	//if ( ( temphlval+rr )>65535 ) set_cflag ();
-	//else clear_cflag ();
-	//
-	//temphlval = ( ( (uint)temphlval+(uint)rr )&0xffff );
-	//hl.w = (u16)temphlval;
 	
 }
 
@@ -434,15 +437,16 @@ void cpu::op_dec_r ( u8 &r )
 	
 	set_nflag ();
 	
-	static u8 old_r = r;
-	
+	int old_r = r;
 	--r;
+	int new_r = r;
 	
-	if ( ( r&0xf0 )!=( old_r&0xf0 ) ) set_hflag ();
+	if ( new_r==0 ) set_zflag ();
+	else clear_zflag ();
+	
+	if ( ( new_r&0xf0 )!=( old_r&0xf0 ) ) set_hflag ();
 	else clear_hflag ();
 	
-	if ( r==0 ) set_zflag ();
-	else clear_zflag ();
 }
 
 void cpu::op_dec_hl_mem ()
@@ -473,14 +477,31 @@ void cpu::op_dec_rr ( u16 &rr )
 void cpu::op_add_sp_dd ()
 {
 	pc++; s8 to_add = op_read (pc); pc++;
-	static u16 result = sp + to_add; 
 	
 	clear_zflag (); clear_nflag ();
-	if ( ( result&0xff )<( sp&0xff ) ) set_cflag ();
-	else clear_cflag ();
-	if ( ( result&0xf )<( sp&0xf ) ) set_hflag ();
-	else clear_hflag ();
-	sp = result;
+	
+	int old_sp = sp, offset, temp;
+	offset = (int)to_add;
+	temp = (int)sp+offset;
+	sp = temp;
+	
+	if ( offset>=0 )
+	{
+		if ( ( old_sp&0xff )+( offset&0xff )>0xff ) set_cflag ();
+		else clear_cflag ();
+		
+		if ( ( old_sp&0x0f )+( offset&0x0f )>0xf ) set_hflag ();
+		else clear_hflag ();
+	}
+	else // if ( offset<0 )
+	{
+		if ( ( sp&0xff )<=( old_sp&0xff ) ) set_cflag ();
+		else clear_cflag ();
+		
+		if ( ( sp&0x0f )<=( old_sp&0x0f ) ) set_hflag ();
+		else clear_hflag ();
+	}
+	
 }
 
 

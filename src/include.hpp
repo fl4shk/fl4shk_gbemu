@@ -4,8 +4,8 @@
 #include <iostream>		// This is eventually going to be killed off
 #include <string>		// This might eventually be used for ROMs not called game.gb
 #include <fstream>		// I don't know why this is here
-#include <string.h>		// This is only needed for mmu::load_game ()
 #include <stdio.h>		// I intend to replace <iostream> with this
+#include <string.h>		// For memset
 using namespace std;
 
 #include <SFML/Graphics.hpp>
@@ -23,6 +23,7 @@ typedef unsigned int uint;
 #endif
 
 typedef sf::Keyboard kinput; typedef sf::Keyboard::Key kb;
+no_fcall bool keydown ( kb key ) { return kinput::isKeyPressed (key); }
 
 class color : public sf::Color
 {
@@ -61,7 +62,7 @@ template < typename t > void printhex ( t val ) { cout << hex << val << dec; }
 	
 namespace ioreg
 {
-	const int joy1 = 0xff00, serial = 0xff01, siocnt = 0xff02, divreg = 0xff04, 
+	static const int joyp = 0xff00, serial = 0xff01, siocnt = 0xff02, divreg = 0xff04, 
 		tmrcount = 0xff05, tmrmod = 0xff06, tmrctrl = 0xff07, intreq = 0xff0f, 
 		nr10 = 0xff10, nr11 = 0xff11, nr12 = 0xff12, nr13 = 0xff13, nr14 = 0xff14, 
 		nr21 = 0xff16, nr22 = 0xff17, nr23 = 0xff18, nr24 = 0xff19, nr30 = 0xff1a, 
